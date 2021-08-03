@@ -89,7 +89,7 @@
 <!-- 		<scifio-bf-compat.version>1.9.0</scifio-bf-compat.version> -->
 		<imagej-ops.version>0.44.1-SNAPSHOT</imagej-ops.version>
 		<imglib2.version>5.7.1-SNAPSHOT</imglib2.version>
-		<imglib2-roi.version>0.5.1-SNAPSHOT</imglib2-roi.version>
+		<imglib2-roi.version>0.5.1</imglib2-roi.version>
 
 		<!-- NB: Deploy releases to the SciJava Maven repository. -->
 		<releaseProfiles>deploy-to-scijava</releaseProfiles>
