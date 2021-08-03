@@ -42,7 +42,7 @@ public class JEXDistributionRightPanel extends JPanel implements ActionListener 
 	public JEXDistributionPanelController parentController;
 
 	// Array distribution buttons and fields
-	private String[] typeStr = {"Image", "Movie", "File", "Value", "Valid", "Voice note" };
+	private String[] typeStr = { "Choose", "Image", "Movie", "File", "Value", "Valid", "Voice note" };
 	private JLabeledComboBox typebox = new JLabeledComboBox("Type of object:", typeStr);
 	private String[] dimStr = { "0D (eg. image)", "1D (eg. image stack)", "2D (eg. image array)", "3D (e.g array timelapse)", "4D", "5D" };
 	private JLabeledComboBox dimensionField = new JLabeledComboBox("Dimension:", dimStr);
@@ -60,7 +60,7 @@ public class JEXDistributionRightPanel extends JPanel implements ActionListener 
 	private int minHeight = 20;
 	private JParameterPanel startPt = new JParameterPanel(new Parameter("First Drop Location", "Choose where in the array the first files will be dropped.", Parameter.DROPDOWN, new String[]{"UL","UR","LL","LR"}), 100);
 	//	private JParameterPanel firstMove = new JParameterPanel(new Parameter("First Indexing Direction", "Choose which way to 'move' first when indexing to the next array location.", Parameter.DROPDOWN, new String[]{"Horizontal","Vertical"}), 100);
-	private JParameterPanel snaking = new JParameterPanel(new Parameter("Snaking?", "Choose if indexing should be done in a snaking pattern.", Parameter.CHECKBOX, false), 20);
+	private JParameterPanel snaking = new JParameterPanel(new Parameter("Snaking?", "Choose if indexing should be done in a snaking pattern.", Parameter.CHECKBOX, true), 20);
 
 	private JParameterPanel rows = new JParameterPanel(new Parameter("Tile Rows", "How many rows of tiles are there per image (must be >= 1). If rows and cols are both <=1, no tiles are created.", Parameter.TEXTFIELD, "1"), 100);
 	private JParameterPanel cols = new JParameterPanel(new Parameter("Tile Cols", "How many cols of tiles are there per image (must be >= 1). If rows and cols are both <=1, no tiles are created.", Parameter.TEXTFIELD, "1"), 100);
@@ -68,7 +68,7 @@ public class JEXDistributionRightPanel extends JPanel implements ActionListener 
 
 	private JParameterPanel filter = new JParameterPanel(new Parameter("Exclusion Filter Table", "Which dimension values should be excluded upon import? Format is <DimName1>=<Val1>,<Val2>,...,<Valn>;<DimName2>=...", Parameter.TEXTFIELD, ""), 100);
 
-	private JParameterPanel virtual = new JParameterPanel(new Parameter("Create Virtual Object?", "If no tiles are being created, should the object just refer to the original files (virtual, warning:experimental), or actually copy the files as usual to create 'real' objects.", Parameter.CHECKBOX, true), 20);
+	private JParameterPanel virtual = new JParameterPanel(new Parameter("Create Virtual Object?", "If no tiles are being created, should the object just refer to the original files (virtual, warning:experimental), or actually copy the files as usual to create 'real' objects.", Parameter.CHECKBOX, false), 20);
 
 	JEXDistributionRightPanel(JEXDistributionPanelController parentController)
 	{
@@ -98,7 +98,6 @@ public class JEXDistributionRightPanel extends JPanel implements ActionListener 
 		dimensionField.setBackground(DisplayStatics.lightBackground);
 		dimensionField.setChangeActor(this);
 		dimensionField.getElement().addActionListener(this);
-		dimensionField.setSelectedIndex(1);
 		this.add(typebox, "growx");
 		this.add(dimensionField, "growx");
 
@@ -282,7 +281,7 @@ public class JEXDistributionRightPanel extends JPanel implements ActionListener 
 		JLabel title = new JLabel("File dealing order:");
 		quickDistribute.add(title, "growx");
 
-		String[] dimPos = { "T", "Array Row", "Array Column", "Z", "R", "C" };
+		String[] dimPos = { "Array Row", "Array Column", "T", "Z", "R", "C" };
 		String dimStr = dimensionField.getSelectedOption().toString();
 		this.parentController.dimension = indexOf(dimStr, this.dimStr) + 2;
 		this.parentController.dimensions = new HashMap<Integer,DimensionSelector>();
