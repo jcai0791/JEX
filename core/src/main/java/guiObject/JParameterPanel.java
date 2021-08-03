@@ -229,7 +229,8 @@ public class JParameterPanel implements DocumentListener, ChangeListener, Action
 			return;
 		}
 		this.resultField.setToolTipText(this.p.getValue());
-		Logs.log("Changed parameter from " + old + " to " + this.p.getValue(), 0, this);
+		
+		if(!old.equals(this.p.getValue())) Logs.log("Changed parameter from " + old + " to " + this.p.getValue(), 0, this);
 	}
 	
 	@Override
@@ -243,7 +244,7 @@ public class JParameterPanel implements DocumentListener, ChangeListener, Action
 			return;
 		}
 		this.resultField.setToolTipText(this.p.getValue());
-		Logs.log("Changed parameter from " + old + " to " + this.p.getValue(), 0, this);
+		if(!old.equals(this.p.getValue())) Logs.log("Changed parameter from " + old + " to " + this.p.getValue(), 0, this);
 	}
 	
 	@Override
@@ -257,7 +258,7 @@ public class JParameterPanel implements DocumentListener, ChangeListener, Action
 			return;
 		}
 		this.resultField.setToolTipText(this.p.getValue());
-		Logs.log("Changed parameter from " + old + " to " + this.p.getValue(), 0, this);
+		if(!old.equals(this.p.getValue())) Logs.log("Changed parameter from " + old + " to " + this.p.getValue(), 0, this);
 	}
 	
 	@Override
@@ -279,7 +280,7 @@ public class JParameterPanel implements DocumentListener, ChangeListener, Action
 					return;
 				}
 				this.resultField.setToolTipText(this.p.getValue());
-				Logs.log("Changed parameter from " + old + " to " + this.p.getValue(), 0, this);
+				if(!old.equals(this.p.getValue())) Logs.log("Changed parameter from " + old + " to " + this.p.getValue(), 0, this);
 			}
 			else
 			{
@@ -327,7 +328,7 @@ public class JParameterPanel implements DocumentListener, ChangeListener, Action
 				return;
 			}
 			this.resultField.setToolTipText(this.p.getValue());
-			Logs.log("Changed parameter from " + old + " to " + this.p.getValue(), 0, this);
+			if(!old.equals(this.p.getValue())) Logs.log("Changed parameter from " + old + " to " + this.p.getValue(), 0, this);
 		}
 	}
 	
@@ -342,7 +343,7 @@ public class JParameterPanel implements DocumentListener, ChangeListener, Action
 			return;
 		}
 		this.resultField.setToolTipText(this.p.getValue());
-		Logs.log("Changed parameter from " + old + " to " + this.p.getValue(), 0, this);
+		if(!old.equals(this.p.getValue())) Logs.log("Changed parameter from " + old + " to " + this.p.getValue(), 0, this);
 	}
 	
 }
