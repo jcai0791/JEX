@@ -34,7 +34,7 @@ public class GraphicalFunctionWrap extends JDialog implements ActionListener {
 	HashMap<String,Parameter> parameters;
 	HashMap<Integer,String[]> parametersForSteps;
 	HashMap<Integer,String> labelForStep;
-	GraphicalCrunchingEnabling function;
+	public GraphicalCrunchingEnabling function;
 	boolean isValid = false;
 	
 	// button looping panel
@@ -51,7 +51,7 @@ public class GraphicalFunctionWrap extends JDialog implements ActionListener {
 	HashMap<Integer,JParameterPanel[]> paramPanelForStep;
 	JButton validateButton;
 	JPanel contentPane;
-	JPanel controlPane;
+	public JPanel controlPane;
 	JPanel centerPane;
 	Color background = DisplayStatics.background;
 	
@@ -202,6 +202,10 @@ public class GraphicalFunctionWrap extends JDialog implements ActionListener {
 	{
 		this.autoReduce = b;
 	}
+	public void setValid (boolean b)
+	{
+		this.isValid = b;
+	}
 	
 	/**
 	 * Refresh and rebuild the function maker
@@ -326,6 +330,13 @@ public class GraphicalFunctionWrap extends JDialog implements ActionListener {
 				}
 			}
 		}
+	}
+	
+	public void disposeThis() {
+		this.dispose();
+		contentPane.removeAll();
+		centerPane.removeAll();
+		controlPane.removeAll();
 	}
 	
 	public void actionPerformed(ActionEvent e)
