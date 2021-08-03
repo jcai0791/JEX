@@ -117,6 +117,11 @@ public class JLabeledComboBox extends JPanel implements ActionListener {
 		field.setEditable(editable);
 	}
 	
+	//New method
+	public void setSelectedIndex(int index) {
+		field.setSelectedIndex(index);
+	}
+	
 	public void refresh()
 	{
 		label.updateUI();
