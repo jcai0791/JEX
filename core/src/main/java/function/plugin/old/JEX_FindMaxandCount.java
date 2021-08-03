@@ -17,6 +17,7 @@ import function.JEXCrunchable;
 import function.tracker.FindMaxima;
 import ij.ImagePlus;
 import ij.gui.Roi;
+import ij.process.ByteProcessor;
 import image.roi.PointList;
 import image.roi.ROIPlus;
 
@@ -152,9 +153,12 @@ public class JEX_FindMaxandCount extends JEXCrunchable {
 		Parameter p2 = new Parameter("Cell Radius", "Cell radius in pixels (e.g. 3 to 30)", "15");
 		Parameter p3 = new Parameter("Min Cell Radius", "Minimum Cell Size (e.g. 0 to 6)", "0");
 		Parameter p4 = new Parameter("Mode", "Which type of calculation to perform?", Parameter.DROPDOWN, new String[] { "Threshold", "Fixed number" }, 1);
-		Parameter p5 = new Parameter("Threshold", "Cell radius in pixels (e.g. 3 to 30)", "15");
-		Parameter p6 = new Parameter("Number of Cells", "Cell radius in pixels (e.g. 3 to 30)", "15");
+		Parameter p5 = new Parameter("Threshold", "Count bright spots above threshold", "15");
+		Parameter p6 = new Parameter("Number of Cells", "Count # bright spots", "15");
 		Parameter p7 = new Parameter("Loop order", "Reverse looping order?", Parameter.DROPDOWN, new String[] { "Normal", "Reverse" }, 1);
+		Parameter p8 = new Parameter("Auto Threshold On?", "Automatically calculate threshold for image.", Parameter.CHECKBOX, false);
+		Parameter p9 = new Parameter("Auto Threshold Method", "Choose which threshold method you want", Parameter.DROPDOWN, new String[] {"Huang", "Intermodes", "IsoData", "Li", "MaxEntropy", "Mean", "MinError(I)", "Minimum", "Moments", "Otsu", "Percentile", "RenyiEntropy", "Shanbhag", "Triangle", "Yen" });
+
 		
 		// Make an array of the parameters and return it
 		ParameterSet parameterArray = new ParameterSet();
@@ -165,6 +169,8 @@ public class JEX_FindMaxandCount extends JEXCrunchable {
 		parameterArray.addParameter(p5);
 		parameterArray.addParameter(p6);
 		parameterArray.addParameter(p7);
+		parameterArray.addParameter(p8);
+		parameterArray.addParameter(p9);
 		return parameterArray;
 	}
 	
@@ -273,11 +279,28 @@ class FindMaxHelperFunction2 implements GraphicalCrunchingEnabling, ImagePanelIn
 		}
 		
 		// //// Get params
-		// boolean auto =
-		// Boolean.parseBoolean(parameters.getValueOfParameter("Automatic"));
+		auto = Boolean.parseBoolean(parameters.getValueOfParameter("Automatic"));
 		int radius = Integer.parseInt(parameters.getValueOfParameter("Cell Radius"));
 		int minradius = Integer.parseInt(parameters.getValueOfParameter("Min Cell Radius"));
-		int threshold = Integer.parseInt(parameters.getValueOfParameter("Threshold"));
+		int threshold = Integer.parseInt(params.getValueOfParameter("Threshold"));
+		DimensionMap map = dimensions.get(0);
+		String imPath = images.get(map);
+		ImagePlus im = new ImagePlus(imPath);
+		
+		if(Boolean.parseBoolean(params.getValueOfParameter("Auto Threshold On?"))) {
+			ByteProcessor imp = (ByteProcessor) im.getProcessor().convertToByte(true);
+			int[] histogram = imp.getHistogram();
+			function.imageUtility.AutoThresholder thresholder = new function.imageUtility.AutoThresholder();
+			threshold = 256*thresholder.getThreshold(this.params.getValueOfParameter("Auto Threshold Method"), histogram);
+			Logs.log("Running threshold method: "+this.params.getValueOfParameter("Auto Threshold Method"), this);
+			Logs.log("Threshold is: "+ threshold, this);
+			//threshold = Math.max(threshold, Double.parseDouble(this.parameters.getValueOfParameter("Threshold")));
+		}
+		else {
+			threshold = Integer.parseInt(this.params.getValueOfParameter("Threshold"));
+			Logs.log("Set threshold is: "+ threshold, this);
+		}
+		
 		int nbCells = Integer.parseInt(parameters.getValueOfParameter("Number of Cells"));
 		String mode = parameters.getValueOfParameter("Mode");
 		String order = parameters.getValueOfParameter("Loop order");
@@ -292,15 +315,24 @@ class FindMaxHelperFunction2 implements GraphicalCrunchingEnabling, ImagePanelIn
 		if(!this.ord)
 			index = this.images.size() - 1;
 		
+		
+		wrap = new GraphicalFunctionWrap(this, params);
 		// Prepare the graphics
 		imagepanel = new ImagePanel(this, "Find Max");
 		imagepanel.setRoi(roi);
-		
 		displayImage(index);
-		wrap = new GraphicalFunctionWrap(this, params);
 		wrap.addStep(0, "Select roi", new String[] { "Automatic", "Cell Radius", "Min Cell Radius", "Threshold", "Number of Cells", "Mode" });
 		wrap.setInCentralPanel(imagepanel);
 		wrap.setDisplayLoopPanel(true);
+		if(auto) {
+			for(int i = 0; i<this.dimensions.size(); i++) this.loopNext();
+			Logs.log("Validating the function... end of visual processing", 1, this);
+			wrap.function.finishIT();
+			wrap.setValid(true);
+			wrap.disposeThis();
+			imagepanel.removeAll();
+		}
+		
 	}
 	
 	private void displayImage(int index)
@@ -328,7 +360,27 @@ class FindMaxHelperFunction2 implements GraphicalCrunchingEnabling, ImagePanelIn
 		// Get the new parameters
 		int radius = Integer.parseInt(params.getValueOfParameter("Cell Radius"));
 		int minradius = Integer.parseInt(params.getValueOfParameter("Min Cell Radius"));
+		
+		
 		int threshold = Integer.parseInt(params.getValueOfParameter("Threshold"));
+		DimensionMap map = dimensions.get(index);
+		String imPath = images.get(map);
+		ImagePlus im = new ImagePlus(imPath);
+		
+		if(Boolean.parseBoolean(params.getValueOfParameter("Auto Threshold On?"))) {
+			ByteProcessor imp = (ByteProcessor) im.getProcessor().convertToByte(true);
+			int[] histogram = imp.getHistogram();
+			function.imageUtility.AutoThresholder thresholder = new function.imageUtility.AutoThresholder();
+			threshold = 256*thresholder.getThreshold(this.params.getValueOfParameter("Auto Threshold Method"), histogram);
+			Logs.log("Running threshold method: "+this.params.getValueOfParameter("Auto Threshold Method"), this);
+			Logs.log("Threshold is: "+ threshold, this);
+			//threshold = Math.max(threshold, Double.parseDouble(this.parameters.getValueOfParameter("Threshold")));
+		}
+		else {
+			threshold = Integer.parseInt(this.params.getValueOfParameter("Threshold"));
+			Logs.log("Set threshold is: "+ threshold, this);
+		}
+		
 		int nbCells = Integer.parseInt(params.getValueOfParameter("Number of Cells"));
 		String mode = params.getValueOfParameter("Mode");
 		finder.threshold = threshold;
@@ -338,9 +390,7 @@ class FindMaxHelperFunction2 implements GraphicalCrunchingEnabling, ImagePanelIn
 		finder.mincellRadius = minradius;
 		
 		// prepare the images for calculation
-		DimensionMap map = dimensions.get(index);
-		String imPath = images.get(map);
-		ImagePlus im = new ImagePlus(imPath);
+		
 		java.awt.Rectangle rect = (roi == null) ? null : roi.getBounds();
 		PointList result = finder.findMaximum(im, rect);
 		
@@ -414,7 +464,7 @@ class FindMaxHelperFunction2 implements GraphicalCrunchingEnabling, ImagePanelIn
 			PointList pList = pLists.get(map);
 			if(pList == null || pList.size() == 0)
 			{
-				Logs.log("Runing missed step " + map, 1, this);
+				Logs.log("Running missed step " + map, 1, this);
 				runStep(index);
 			}
 			

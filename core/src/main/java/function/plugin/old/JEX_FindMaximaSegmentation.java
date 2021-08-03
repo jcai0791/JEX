@@ -191,7 +191,8 @@ public class JEX_FindMaximaSegmentation extends JEXCrunchable {
 		Parameter p8 = new Parameter("If New: 4 or 8 Connected?", "Use the old ImageJ watershed or new MorphLibJ implementation?.", Parameter.DROPDOWN, new String[] {"4","8"}, 0);
 		Parameter p9 = new Parameter("Segmentation Pre-Despeckle Radius", "The radius of the median filter used on the channel to be used for segmentation prior to watershedding.", Parameter.TEXTFIELD, "0");
 		Parameter p10 = new Parameter("Segmentation Pre-Smoothing Radius", "The radius of the mean filter used on the channel to be used for segmentation prior to watershedding.", Parameter.TEXTFIELD, "0");
-		
+		Parameter p11 = new Parameter("Auto Threshold On?", "Automatically calculate threshold for image.", Parameter.CHECKBOX, false);
+		Parameter p12 = new Parameter("Auto Threshold Method", "Choose which threshold method you want", Parameter.DROPDOWN, new String[] {"Huang", "Intermodes", "IsoData", "Li", "MaxEntropy", "Mean", "MinError(I)", "Minimum", "Moments", "Otsu", "Percentile", "RenyiEntropy", "Shanbhag", "Triangle", "Yen" });
 		// Make an array of the parameters and return it
 		ParameterSet parameterArray = new ParameterSet();
 		parameterArray.addParameter(p00);
@@ -212,6 +213,8 @@ public class JEX_FindMaximaSegmentation extends JEXCrunchable {
 		parameterArray.addParameter(p8);
 		parameterArray.addParameter(p9);
 		parameterArray.addParameter(p10);
+		parameterArray.addParameter(p11);
+		parameterArray.addParameter(p12);
 		return parameterArray;
 	}
 	
@@ -279,7 +282,7 @@ public class JEX_FindMaximaSegmentation extends JEXCrunchable {
 			String nuclearDimValue = this.parameters.getValueOfParameter("Maxima Color Dim Value");
 			String segDimValue = this.parameters.getValueOfParameter("Segmentation Color Dim Value");
 			double tolerance = Double.parseDouble(this.parameters.getValueOfParameter("Tolerance"));
-			double threshold = Double.parseDouble(this.parameters.getValueOfParameter("Threshold"));
+			
 			boolean excludePtsOnEdges = Boolean.parseBoolean(this.parameters.getValueOfParameter("Exclude Maximima on Edges?"));
 			boolean excludeSegsOnEdges = Boolean.parseBoolean(this.parameters.getValueOfParameter("Exclude Segments on Edges?"));
 			boolean isEDM = Boolean.parseBoolean(this.parameters.getValueOfParameter("Is EDM?"));
@@ -366,6 +369,21 @@ public class JEX_FindMaximaSegmentation extends JEXCrunchable {
 				ImagePlus im = new ImagePlus(pathToGet);
 				FloatProcessor ip = (FloatProcessor) im.getProcessor().convertToFloat();
 				im.setProcessor(ip);
+				
+				double threshold;
+				if(Boolean.parseBoolean(this.parameters.getValueOfParameter("Auto Threshold On?"))) {
+					ByteProcessor imp = (ByteProcessor) im.getProcessor().convertToByte(true);
+					int[] histogram = imp.getHistogram();
+					function.imageUtility.AutoThresholder thresholder = new function.imageUtility.AutoThresholder();
+					threshold = (double) 256*thresholder.getThreshold(this.parameters.getValueOfParameter("Auto Threshold Method"), histogram);
+					Logs.log("Running threshold method: "+this.parameters.getValueOfParameter("Auto Threshold Method"), this);
+					Logs.log("Threshold is: "+ threshold, this);
+					//threshold = Math.max(threshold, Double.parseDouble(this.parameters.getValueOfParameter("Threshold")));
+				}
+				else {
+					threshold = Double.parseDouble(this.parameters.getValueOfParameter("Threshold"));
+					Logs.log("Set threshold is: "+ threshold, this);
+				}
 				
 				if(despeckleR > 0)
 				{
