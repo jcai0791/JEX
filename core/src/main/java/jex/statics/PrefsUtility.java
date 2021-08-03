@@ -1,10 +1,9 @@
 package jex.statics;
 
-import Database.SingleUserDatabase.Repository;
-
 import java.util.ArrayList;
 import java.util.List;
 
+import Database.SingleUserDatabase.Repository;
 import logs.Logs;
 import preferences.XPreferences;
 
@@ -31,6 +30,11 @@ public class PrefsUtility {
 	public static final String ATT_REPOSITORYUSERNAME = "UserName";
 	public static final String ATT_REPOSITORYPASSWORD = "Password";
 	
+	public static final String ATT_WORKFLOWLOCATION = "Workflow Location";
+	public static final String ATT_FILEDEALT = "File Dealing Time";
+	// public static final String ATT_FILEDEALROW = "File Dealing Row";
+	// public static final String ATT_FILEDEALCOL = "File Dealing Column";
+	
 	public static XPreferences preferences;
 	
 	public static XPreferences getRootPrefs()
@@ -47,6 +51,26 @@ public class PrefsUtility {
 	{
 		return getUserPrefs().get(ATT_LASTPATH, "/");
 	}
+	
+	public static String getWorkflowLocation()
+	{
+		return getUserPrefs().get(ATT_WORKFLOWLOCATION, "/");
+	}
+	public static String getFileDealT()
+	{
+		return getUserPrefs().get(ATT_FILEDEALT, "1");
+		// else if(s.equals("Array Row")) return getUserPrefs().get(ATT_FILEDEALROW,"1");
+		// else if(s.equals("Array Column")) return getUserPrefs().get(ATT_FILEDEALCOL,"1");
+	}
+	
+	public static void setFileDealT(String value)
+	{
+		getUserPrefs().put(ATT_FILEDEALT, value);
+		// else if(s.equals("Array Row")) getUserPrefs().put(ATT_FILEDEALROW, value);
+		// else if(s.equals("Array Column")) getUserPrefs().put(ATT_FILEDEALCOL, value);
+	}
+	
+	
 	
 	public static void setLastPath(String path)
 	{
@@ -293,6 +317,10 @@ public class PrefsUtility {
 		// each possible node and attribute has been loaded
 		getUserPrefs();
 		getLastPath();
+		getWorkflowLocation();
+		getFileDealT();
+		// getFileDeal("Array Row");
+		// getFileDeal("Array Column");
 		getConsolidateDatabase();
 		getAutoRemoveOnDelete();
 		getExternalPluginsFolder();

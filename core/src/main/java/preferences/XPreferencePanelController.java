@@ -73,5 +73,9 @@ public class XPreferencePanelController implements ActionListener {
 			SSCenter.defaultCenter().emit(this, SIG_Cancel_NULL, (Object[]) null);
 		}
 	}
+	public void savePreferences()
+	{
+		SSCenter.defaultCenter().emit(this, SIG_Save_NULL, (Object[]) null);
+	}
 	
 }
