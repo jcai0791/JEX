@@ -98,6 +98,7 @@ public class CrunchFactory extends URLClassLoader {
 		if(Updater.runningFromJar())
 		{
 			// We are running from a jar
+			// In Eclipse, jarPath and jarFile are null
 			try
 			{
 				URL jarFile = new URL(classLoaderURL.toString().substring(0, classLoaderURL.toString().indexOf("!") + 2)); // jar file that JEX is packaged in
@@ -216,21 +217,23 @@ public class CrunchFactory extends URLClassLoader {
 	private void findSciJavaPlugins()
 	{		
 		String pathsToLoad = PrefsUtility.getExternalPluginsFolder();
-
 		// Add paths from the preferences for finding JEXPlugins in externally defined jar files
 		SSVList pathSVList = new SSVList(pathsToLoad);
 		// Add the default plugins folder that is distributed with the jar'd JEX software
 		if(this.jarPath != null)
 		{
-			pathSVList.insertElementAt(this.jarPath + File.separator + "plugins", 0);
+			pathSVList.insertElementAt(this.jarPath + "function", 0);
 		}
+		
 		for(String pathToLoad : pathSVList)
 		{
+			
 			File folderToLoad = new File(pathToLoad);
 			if(folderToLoad.exists())
 			{
 				// Add any jars we find on these paths to the class path of loader
 				this.findJarsInFolder(pathToLoad);
+				Logs.log("Found JAR in '" + pathToLoad + "' specified as an 'External Plugins Folder' in the JEX preferences.", this);
 			}
 			else
 			{
@@ -242,6 +245,8 @@ public class CrunchFactory extends URLClassLoader {
 		allSciJavaPlugins.clear();
 		pf.findPlugins(allSciJavaPlugins);
 	}
+	
+	
 
 	private void loadSciJavaPlugins()
 	{
@@ -266,8 +271,10 @@ public class CrunchFactory extends URLClassLoader {
 		//		}
 
 		// Then try to set all the JEXPlugins that are internal (best guess is that their package is functions.plugin.plugins)
+		Logs.log("Starting loadPlugins", this);
 		for(PluginInfo<?> pi : allSciJavaPlugins)
 		{
+			Logs.log(pi.getClassName(), this);
 			if(pi.getPluginType() == JEXPlugin.class && pi.getClassName().startsWith("function.plugin.plugins"))
 			{
 				@SuppressWarnings("unchecked")
@@ -347,6 +354,7 @@ public class CrunchFactory extends URLClassLoader {
 	{
 		if(jarFile == null)
 		{
+			Logs.log("Could not find old plugin names", this);
 			return;
 		}
 		try
@@ -362,12 +370,27 @@ public class CrunchFactory extends URLClassLoader {
 				{
 					String packageName = names[names.length - 2];
 					String name = names[names.length - 1];
-					if(packageName.equals("old") && name.length() >= 4 && name.startsWith("JEX_") && name.endsWith(".class") && !name.contains("$"))
+					if(packageName.equals("old") && name.length() >= 4 && name.startsWith("JEX_") && name.endsWith(".class")
+							//&& !name.contains("$")
+							)
 					{
 						// Need to check for $ because those represent class files that are extra created by Eclipse that won't work
 						Logs.log("Found JEXCrunchable: " + name, CrunchFactory.class);
 						this.internalOldJEXCrunchableNames.add(name.substring(0, name.length() - 6));
 					}
+					/**
+					if(names.length>3 && names[names.length-4].equals("plugin") && name.endsWith(".class")) {
+						Logs.log("Found plugin: " + name, this);
+						// load the annotation indexes
+						final ClassLoader classLoader = getClass().getClassLoader();
+						final Index<Plugin> annotationIndex = Index.load(Plugin.class, classLoader);
+						for(final IndexItem<Plugin> item : annotationIndex)	{
+							final PluginInfo<?> info = DefaultPluginFinder.createInfo(item, classLoader);
+							
+						}
+						plugins.add(info);
+					}
+					**/
 				}
 			}
 		}
