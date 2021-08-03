@@ -2,6 +2,7 @@ package miscellaneous;
 
 import java.awt.Component;
 import java.awt.Desktop;
+import java.awt.Dimension;
 import java.io.File;
 import java.io.IOException;
 import java.util.Collections;
@@ -435,6 +436,7 @@ public class FileUtility implements Comparator<File> {
 	public static String openPath(String path, boolean directories, Component comp)
 	{
 		JFileChooser chooser = new JFileChooser();
+		chooser.setPreferredSize(new Dimension(600,800));
 		if(directories)
 		{
 			chooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);

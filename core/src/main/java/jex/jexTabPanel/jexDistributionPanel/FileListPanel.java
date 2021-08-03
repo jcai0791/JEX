@@ -22,6 +22,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 
 import jex.statics.DisplayStatics;
+import jex.statics.PrefsUtility;
 import logs.Logs;
 import miscellaneous.CSVList;
 import miscellaneous.FileUtility;
@@ -342,17 +343,21 @@ public class FileListPanel extends DialogGlassCenterPanel implements ActionListe
 	{
 		// File f = new File("/Volumes/shared/")
 		JFileChooser fc = null;
+		
 		if(folderVisited != null)
 		{
 			fc = new JFileChooser(folderVisited);
 		}
 		else
 		{
-			fc = new JFileChooser();
+			fc = new JFileChooser(PrefsUtility.getLastPath());
 		}
 		// JFileChooser fc = new JFileChooser();
 		fc.setMultiSelectionEnabled(true);
 		fc.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
+		
+		fc.setPreferredSize(new Dimension(600,800));
+		
 		int returnVal = fc.showOpenDialog(this);
 		if(returnVal == JFileChooser.APPROVE_OPTION)
 		{

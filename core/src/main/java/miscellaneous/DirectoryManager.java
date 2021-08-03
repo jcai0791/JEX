@@ -1,6 +1,7 @@
 package miscellaneous;
 
 import java.awt.Component;
+import java.awt.Dimension;
 import java.io.File;
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
@@ -143,6 +144,7 @@ public class DirectoryManager {
 	{
 		JFileChooser fc = new JFileChooser();
 		fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+		fc.setPreferredSize(new Dimension(600,800));
 		int returnVal = fc.showOpenDialog(parent);
 		File directory = null;
 		if(returnVal == JFileChooser.APPROVE_OPTION)

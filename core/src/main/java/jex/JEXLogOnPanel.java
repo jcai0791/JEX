@@ -235,6 +235,7 @@ public class JEXLogOnPanel extends JFrame implements ActionListener {
 			// Creating file chooser to open user preferences
 			JFileChooser fc = new JFileChooser();
 			// fc.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
+			fc.setPreferredSize(new Dimension(600,800));
 			
 			// Set the current directory
 			String lastPath = PrefsUtility.getLastPath();

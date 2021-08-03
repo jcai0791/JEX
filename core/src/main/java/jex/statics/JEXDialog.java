@@ -1,5 +1,6 @@
 package jex.statics;
 
+import java.awt.Dimension;
 import java.awt.SystemColor;
 import java.io.File;
 import java.io.IOException;
@@ -107,6 +108,7 @@ public class JEXDialog {
 		// Creating file chooser or save dialog (but both using the save dialog because those allow you to create new folders along during the dialog)
 		JFileChooser fc = new JFileChooser();
 		fc.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
+		fc.setPreferredSize(new Dimension(600,800));
 		if(save)
 		{
 			fc.setDialogType(JFileChooser.SAVE_DIALOG);
