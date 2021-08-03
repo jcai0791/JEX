@@ -25,6 +25,7 @@ public abstract class JEXPlugin implements SciJavaPlugin, Canceler, Cancelable {
 	public void finalizeEntry()
 	{
 		JEXStatics.statusBar.setProgressPercentage(0);
+		JEXStatics.statusBar.hideBar();
 	}
 
 	public void prepareTicket()

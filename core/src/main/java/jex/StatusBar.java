@@ -96,6 +96,14 @@ public class StatusBar extends JPanel implements Runnable, ActionListener {
 	{
 		setProgressPercentage(0);
 	}
+	public void hideBar()
+	{
+		bar.hide();
+	}
+	public void showBar()
+	{
+		bar.show();
+	}
 	
 	/**
 	 * Set the advancement of the progress bar
@@ -111,6 +119,10 @@ public class StatusBar extends JPanel implements Runnable, ActionListener {
 		progressRect.x = 0;
 		progressRect.y = 0;
 		bar.paintImmediately(progressRect);
+		
+		if(progress==100) hideBar();
+		else showBar();
+		
 	}
 	
 	/**

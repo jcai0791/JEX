@@ -74,12 +74,14 @@ public abstract class JEXCrunchable implements Canceler, Cancelable {
 	public void prepareEntry()
 	{
 		this.realOutputs = new HashSet<JEXData>();
+		JEXStatics.statusBar.showBar();
 	}
 	
 	// run after ending
 	public void finalizeEntry()
 	{
 		JEXStatics.statusBar.setProgressPercentage(0);
+		JEXStatics.statusBar.hideBar();
 	}
 	
 	public void prepareTicket()

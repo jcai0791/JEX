@@ -60,6 +60,7 @@ public class JEXCrunchablePlugin extends JEXCrunchable {
 	public void finalizeEntry()
 	{
 		JEXStatics.statusBar.setProgressPercentage(0);
+		JEXStatics.statusBar.hideBar();
 	}
 	
 	public void prepareTicket()

@@ -986,6 +986,7 @@ public class JEXDB implements Iterable<JEXEntry> {
 			JEXStatics.statusBar.setProgressPercentage(percentage);
 		}
 		JEXStatics.statusBar.setProgressPercentage(0);
+		JEXStatics.statusBar.hideBar();
 		
 		this.fTNVI = this.TNVI;
 		this.sTNVI = this.TNVI;
