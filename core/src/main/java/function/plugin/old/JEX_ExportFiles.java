@@ -15,6 +15,9 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.TreeMap;
 
+import java.io.BufferedReader;
+import java.io.FileWriter;
+
 import jex.statics.JEXStatics;
 import logs.Logs;
 import miscellaneous.FileUtility;
@@ -175,6 +178,7 @@ public class JEX_ExportFiles extends JEXCrunchable {
 	{
 		// Collect the inputs
 		JEXData data = inputs.get("Files to Export");
+		
 		if(!(data.getTypeName().getType().matches(JEXData.FILE) || data.getTypeName().getType().matches(JEXData.ROI) || data.getTypeName().getType().matches(JEXData.IMAGE) || data.getTypeName().getType().matches(JEXData.MOVIE) || data.getTypeName().getType().matches(JEXData.WORKFLOW) || data.getTypeName().getType().matches(JEXData.SOUND)))
 		{
 			return false;
@@ -202,6 +206,7 @@ public class JEX_ExportFiles extends JEXCrunchable {
 		for (DimensionMap dim : filePaths.keySet())
 		{
 			String path = filePaths.get(dim);
+			Logs.log("Path is: "+path, this);
 			File f = new File(path);
 			String fileName = f.getName();
 			if(ext2.equals("same"))
@@ -218,7 +223,38 @@ public class JEX_ExportFiles extends JEXCrunchable {
 			
 			try
 			{
-				JEXWriter.copy(f, dst);
+				//JEXWriter.copy(f, dst);
+				
+				
+				//Experimental way to not have the @ stuff at the beginning of every csv
+				Logs.log("Copying from " + f.getPath() + " to " + dst.getPath(), 0, this);
+				FileWriter writer = new FileWriter(newFilePath);
+				java.io.FileReader fileReader = new java.io.FileReader(f);
+			    BufferedReader bufferedReader = new BufferedReader(fileReader);
+			    
+			    //writer.write("Time,Mean,Position,Value\r\n");
+			    String line = "";
+			    boolean enterData = false;
+			    while ((line = bufferedReader.readLine()) != null) {
+			        if(line.startsWith("@attribute")) {
+			        	String[] lineArray = line.split(" ");
+			        	writer.write(lineArray[1]+",");
+			        }
+			        // Write new line to new file
+			        if(line.matches("[!-?A-~](.*)")) {
+			        	if(!enterData) {
+			        		writer.write("\r\n");
+			        		enterData = true;
+			        	}
+			        	writer.write(line + "\r\n");
+			        }
+			    }
+
+			    // Close reader and writer
+			    bufferedReader.close();
+			    writer.close();
+			    
+
 			}
 			catch (IOException e)
 			{
