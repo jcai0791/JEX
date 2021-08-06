@@ -210,7 +210,7 @@ public class JEX_FindMaxandCount extends JEXCrunchable {
 		
 		// Run the function
 		FindMaxHelperFunction2 graphFunc = new FindMaxHelperFunction2(entry, data1, data2, outputNames, parameters);
-		graphFunc.doit();
+		if(!Boolean.parseBoolean(this.parameters.getValueOfParameter("Automatic"))) graphFunc.doit();
 		
 		// Set the outputs
 		JEXData output1 = graphFunc.output;
@@ -325,12 +325,12 @@ class FindMaxHelperFunction2 implements GraphicalCrunchingEnabling, ImagePanelIn
 		wrap.setInCentralPanel(imagepanel);
 		wrap.setDisplayLoopPanel(true);
 		if(auto) {
+			wrap.setDisplayLoopPanel(false);
 			for(int i = 0; i<this.dimensions.size(); i++) this.loopNext();
 			Logs.log("Validating the function... end of visual processing", 1, this);
 			wrap.function.finishIT();
 			wrap.setValid(true);
-			wrap.disposeThis();
-			imagepanel.removeAll();
+			wrap.dispose();
 		}
 		
 	}

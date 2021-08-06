@@ -332,12 +332,6 @@ public class GraphicalFunctionWrap extends JDialog implements ActionListener {
 		}
 	}
 	
-	public void disposeThis() {
-		this.dispose();
-		contentPane.removeAll();
-		centerPane.removeAll();
-		controlPane.removeAll();
-	}
 	
 	public void actionPerformed(ActionEvent e)
 	{
