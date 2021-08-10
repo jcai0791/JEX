@@ -274,14 +274,20 @@ public class CrunchFactory extends URLClassLoader {
 		Logs.log("Starting loadPlugins", this);
 		for(PluginInfo<?> pi : allSciJavaPlugins)
 		{
-			Logs.log(pi.getClassName(), this);
 			if(pi.getPluginType() == JEXPlugin.class && pi.getClassName().startsWith("function.plugin.plugins"))
 			{
+				try {
 				@SuppressWarnings("unchecked")
 				JEXPluginInfo fullInfo = new JEXPluginInfo((PluginInfo<JEXPlugin>) pi);
+				
+				
 				JEXCrunchablePlugin crunchable = new JEXCrunchablePlugin(fullInfo);
 				jexCrunchables().put(crunchable.getName(), crunchable);
 				Logs.log("Loaded internal JEXPlugin: " + pi.getName() + " - "+ pi.getClassName(), CrunchFactory.class);
+				} catch (Exception e3) {
+					Logs.log("(Error not Exception!) Couldn't instantiate internal plugin: " + pi.getName() + " - " + pi.getClassName(), Logs.ERROR, this);
+					e3.printStackTrace();
+				}
 			}
 		}
 
