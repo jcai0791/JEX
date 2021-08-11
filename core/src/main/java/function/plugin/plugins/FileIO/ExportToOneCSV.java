@@ -36,7 +36,7 @@ import tables.DimensionMap;
 		name = "Export CSV",
 		menuPath="File IO",
 		visible=true,
-		description = "Exports experiment data to CSV"
+		description = "Exports experiment data, including labels, to one CSV"
 		)
 
 public class ExportToOneCSV extends JEXPlugin {
