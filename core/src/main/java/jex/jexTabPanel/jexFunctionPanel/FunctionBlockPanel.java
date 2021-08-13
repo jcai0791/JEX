@@ -24,6 +24,7 @@ import java.util.TreeMap;
 
 import javax.swing.BorderFactory;
 import javax.swing.Box;
+import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
@@ -34,13 +35,16 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
 import Database.Definition.ParameterSet;
+import Database.Definition.Type;
 import Database.Definition.TypeName;
 import cruncher.JEXFunction;
 import function.JEXCrunchable;
 import function.plugin.mechanism.JEXCrunchablePlugin;
 import guiObject.FlatRoundedButton;
+import icons.IconRepository;
 import jex.statics.DisplayStatics;
 import jex.statics.JEXDialog;
+import jex.statics.JEXStatics;
 import logs.Logs;
 import miscellaneous.FontUtility;
 import net.miginfocom.swing.MigLayout;
@@ -62,8 +66,7 @@ public class FunctionBlockPanel implements ActionListener, MouseListener {
 	JLabel functionName = new JLabel();
 	JPanel runPane = new JPanel();
 	JButton runButton = new JButton();
-	// JButton testButton = new JButton() ;
-
+	
 	// variables
 	protected JEXFunction function;
 	protected ParameterSet parameters;
@@ -151,6 +154,7 @@ public class FunctionBlockPanel implements ActionListener, MouseListener {
 		this.outputList.setLayout(new MigLayout("flowy, ins 0", "[fill,grow]", "[]2"));
 		// outputList.setAlignmentX(JPanel.LEFT_ALIGNMENT);
 
+		
 		this.centerPane.setBackground(this.foregroundColor);
 		this.centerPane.setLayout(new MigLayout("flowy, ins 0, gapy 3", "[left,fill,grow]", "[]"));
 		this.centerPane.add(this.inputList, "growx,width 50:100:");
@@ -196,6 +200,15 @@ public class FunctionBlockPanel implements ActionListener, MouseListener {
 		JLabel inputLabel = new JLabel("Inputs:");
 		// inputLabel.setAlignmentX(JPanel.LEFT_ALIGNMENT);
 		this.inputList.add(inputLabel, "growx");
+		
+		
+//		//Prepare function popup button
+//		popUpButton.setText("+");
+//		this.popUpButton.addActionListener(this);
+//		popUpButton.setMaximumSize(new Dimension(25,25));
+//		this.inputList.add(this.popUpButton);
+		
+		
 		// inputList.setAlignmentX(JPanel.LEFT_ALIGNMENT);
 		SortedMap<String,String> iDescriptions = null;
 		if(this.function.getCrunch() instanceof JEXCrunchablePlugin)
@@ -438,6 +451,7 @@ public class FunctionBlockPanel implements ActionListener, MouseListener {
 		TypeName inname;
 		String toolTip;
 		FunctionBlockPanel parent;
+		//JButton popUpButton = new JButton();
 
 		JPanel dropArea = new JPanel();
 		JLabel inputTNLabel = new JLabel();
@@ -513,6 +527,13 @@ public class FunctionBlockPanel implements ActionListener, MouseListener {
 			this.add(this.box, "width 20:20:20, height 20:20:20");
 			this.add(Box.createHorizontalStrut(5));
 			this.add(this.inputTNLabel, "growx");
+//			if(this.inname.getType().matches(new Type("Image"))) {
+//				Icon icon = JEXStatics.iconRepository.getIconWithName(IconRepository.ADD, 20,20);
+//				popUpButton = new JButton(icon);
+//				this.add(popUpButton);
+//				this.popUpButton.setPreferredSize(new Dimension(20,20));
+//				this.popUpButton.setMaximumSize(new Dimension(20,20));
+//			}
 		}
 
 		private void rebuild()
@@ -636,7 +657,7 @@ public class FunctionBlockPanel implements ActionListener, MouseListener {
 	// ----------------------------------------------------
 	// --------- OUTPUT BOX -------------------------------
 	// ----------------------------------------------------
-	class FunctionOutputDrag extends JPanel implements DragGestureListener, DocumentListener {
+	class FunctionOutputDrag extends JPanel implements DragGestureListener, DocumentListener, ActionListener {
 
 		private static final long serialVersionUID = 1L;
 
@@ -709,6 +730,7 @@ public class FunctionBlockPanel implements ActionListener, MouseListener {
 			this.box.setBorder(BorderFactory.createLineBorder(Color.black));
 			this.box.setBackground(Color.RED);
 			this.saveOutput.setToolTipText("Check this box to set the output to be saved in the database");
+			this.saveOutput.addActionListener(this);
 
 			// Create the drag source
 			this.createDragSource();
@@ -731,6 +753,8 @@ public class FunctionBlockPanel implements ActionListener, MouseListener {
 			this.add(Box.createHorizontalStrut(5));
 			this.add(this.saveOutput);
 			this.add(this.outputTNLabel, "growx");
+			
+			this.setCanRun(saveOutput.isSelected());
 			this.repaint();
 		}
 
@@ -788,6 +812,14 @@ public class FunctionBlockPanel implements ActionListener, MouseListener {
 		{
 			this.tn.setName(this.outputTNLabel.getText());
 		}
+
+		@Override
+		public void actionPerformed(ActionEvent arg0) {
+			if(arg0.getSource()==this.saveOutput) this.setCanRun(this.getSavingSelection());
+			
+		}
+		
+		
 	}
 
 	// ----------------------------------------------------
