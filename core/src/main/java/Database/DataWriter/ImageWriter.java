@@ -357,6 +357,32 @@ public class ImageWriter implements Cancelable {
 		
 		return outputMap;
 	}
+	public static TreeMap<DimensionMap,ImageProcessor> separateTiles(Map<DimensionMap, ImageProcessor> images, double overlap, int rows, int cols)
+	{
+		SeparateImageTiles splitter = new SeparateImageTiles();
+		overlap = overlap/100.0; // Turn percent into fraction.
+		
+		// Run the function
+		TreeMap<DimensionMap,ImageProcessor> outputMap = new TreeMap<>();
+		
+		int count = 0;
+		TreeMap<DimensionMap,ROIPlus> cropRois = null;
+		for (DimensionMap map : images.keySet())
+		{
+			
+			ImageProcessor imp = images.get(map);
+			
+			cropRois = splitter.getCropRois(imp.getWidth(), imp.getHeight(), rows, cols, overlap);
+			TreeMap<DimensionMap,ImageProcessor> toSave = splitter.getCropImageProcessors(cropRois, map, imp);
+			outputMap.putAll(toSave);
+			
+			// Status bar
+			int percentage = (int) (100 * ((double) count / (double) images.size()));
+			JEXStatics.statusBar.setProgressPercentage(percentage);
+		}
+		
+		return outputMap;
+	}
 	
 	/**
 	 * Return an image stack object from filepaths and a dimensionname (ie T, Time, Z, etc...)
