@@ -67,6 +67,7 @@ public class ImportThread implements Callable<Object>, Canceler {
 	
 	public ImportThread call() throws Exception
 	{
+		JEXStatics.statusBar.showBar();
 		JEXStatics.statusBar.setStatusText("Importing new object named: " + objectName + ". Use Ctrl(CMD) + G to cancel the import task.");
 		toAdd = new TreeMap<JEXEntry,JEXData>();
 		double count = 0;
