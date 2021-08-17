@@ -3,6 +3,8 @@ package Database.DBObjects;
 import Database.Definition.Type;
 import Database.Definition.TypeName;
 import Database.SingleUserDatabase.JEXDataIO;
+import cruncher.JEXFunction;
+import function.imageUtility.VirtualFunctionUtility;
 
 import java.util.HashMap;
 import java.util.List;
@@ -35,6 +37,7 @@ public class JEXData {
 	// Special JEXData flavors
 	public static final String FLAVOR_VIRTUAL = "Virtual";
 	public static final String FLAVOR_UPDATE = "Update";
+	public static final String FLAVOR_VIRTUAL_FUNCTION = "Virtual Function";
 	
 	// JEXData fields
 	public static final String NAME = "Name";
@@ -55,6 +58,7 @@ public class JEXData {
 	private TreeMap<DimensionMap,JEXDataSingle> datamap = null;
 	public DimTable dimTable;
 	public String eid;
+	public VirtualFunctionUtility function;
 	
 	protected JEXEntry entry;
 	private String detachedRelativePath = null;
@@ -260,6 +264,11 @@ public class JEXData {
 	public boolean hasVirtualFlavor()
 	{
 		return this.hasFlavor(FLAVOR_VIRTUAL);
+	}
+	
+	public boolean hasVirtualFunctionFlavor()
+	{
+		return this.hasFlavor(FLAVOR_VIRTUAL_FUNCTION);
 	}
 	
 	/**
