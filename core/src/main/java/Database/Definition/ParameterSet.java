@@ -95,4 +95,8 @@ public class ParameterSet {
 	{
 		return this.paramsByOrderAdded;
 	}
+	
+	public TreeMap<String,Parameter>  getParametersTree(){
+		return this.paramsByName;
+	}
 }
