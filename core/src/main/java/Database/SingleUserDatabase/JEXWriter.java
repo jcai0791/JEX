@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.util.Collection;
+import java.util.TreeMap;
 import java.util.Vector;
 
 import org.apache.commons.io.FileUtils;
@@ -15,6 +16,7 @@ import org.apache.commons.io.FileUtils;
 import Database.DBObjects.JEXData;
 import Database.DBObjects.JEXDataSingle;
 import Database.DBObjects.JEXEntry;
+import Database.Definition.Parameter;
 import Database.Definition.Type;
 import function.plugin.IJ2.IJ2PluginUtility;
 import ij.ImagePlus;
@@ -1029,6 +1031,47 @@ public class JEXWriter {
 		{
 			System.out.println("ERROR creatingfile");
 		}
+	}
+
+	/**
+	 * Saves an arff file of this format:
+	 * imagePath,
+	 * functionName,
+	 * Parameter1name, Parameter1value,
+	 * Parameter2name, Parameter2value,
+	 * 
+	 * @param imagePath
+	 * @param parameters
+	 * @param functionName
+	 * @return
+	 */
+	public static String saveVirtualImage(TreeMap<String,String> inputs, TreeMap<String,Parameter> parameters, String functionName) {
+		// Create the file path
+		String fullPath = JEXWriter.getDatabaseFolder() + File.separator + JEXWriter.getUniqueRelativeTempPath("vfn");
+
+		// If the image is null return null
+		if(inputs==null||parameters==null) return null;
+
+		// Save the image
+		
+		Logs.log("Saving virtual image to: " + fullPath, 1, JEXWriter.class);
+		try
+		{
+			Writer writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(fullPath), "UTF-8"));
+			writer.write(functionName+",\n");
+			for(String s : inputs.keySet()) {
+				writer.write("Input,"+s+","+inputs.get(s)+",\n");
+			}
+			for(String s : parameters.keySet()) {
+				writer.write("Parameter,"+parameters.get(s).getTitle()+","+parameters.get(s).getValue()+",\n");
+			}
+			writer.close();
+		}
+		catch (IOException e)
+		{
+			System.out.println("ERROR creating file");
+		}
+		return fullPath;
 	}
 	
 }
