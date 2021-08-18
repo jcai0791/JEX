@@ -2,6 +2,7 @@ package function.plugin.old;
 
 import java.awt.Shape;
 import java.io.File;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.TreeMap;
 import java.util.Vector;
@@ -19,6 +20,7 @@ import Database.Definition.TypeName;
 import Database.SingleUserDatabase.JEXWriter;
 import function.JEXCrunchable;
 import function.imageUtility.MaximumFinder;
+import function.imageUtility.VirtualFunctionUtility;
 import function.plugin.plugins.imageProcessing.GaussianBlur2;
 import function.plugin.plugins.imageProcessing.RankFilters2;
 import ij.ImagePlus;
@@ -367,7 +369,16 @@ public class JEX_FindMaximaSegmentation extends JEXCrunchable {
 					continue;
 				}
 				ImagePlus im = new ImagePlus(pathToGet);
-				FloatProcessor ip = (FloatProcessor) im.getProcessor().convertToFloat();
+				FloatProcessor ip = null;
+				if(imageData.hasVirtualFunctionFlavor()) {
+					try {
+						VirtualFunctionUtility vfu = new VirtualFunctionUtility(imageMap.get(map));
+						ip = vfu.call().convertToFloatProcessor();
+					} catch (InstantiationException | IllegalAccessException | IOException e1) {
+						e1.printStackTrace();
+					}
+				}
+				else ip = (new ImagePlus(imageMap.get(map)).getProcessor().convertToFloatProcessor());
 				im.setProcessor(ip);
 				
 				double threshold;

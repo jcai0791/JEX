@@ -14,14 +14,18 @@ import function.GraphicalFunctionWrap;
 import function.ImagePanel;
 import function.ImagePanelInteractor;
 import function.JEXCrunchable;
+import function.imageUtility.VirtualFunctionUtility;
 import function.tracker.FindMaxima;
 import ij.ImagePlus;
 import ij.gui.Roi;
 import ij.process.ByteProcessor;
+import ij.process.FloatProcessor;
+import ij.process.ImageProcessor;
 import image.roi.PointList;
 import image.roi.ROIPlus;
 
 import java.awt.Point;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -285,10 +289,20 @@ class FindMaxHelperFunction2 implements GraphicalCrunchingEnabling, ImagePanelIn
 		int threshold = Integer.parseInt(params.getValueOfParameter("Threshold"));
 		DimensionMap map = dimensions.get(0);
 		String imPath = images.get(map);
-		ImagePlus im = new ImagePlus(imPath);
+
+		ImageProcessor fp = null;
+		if(imset.hasVirtualFunctionFlavor()) {
+			try {
+				VirtualFunctionUtility vfu = new VirtualFunctionUtility(imPath);
+				fp = vfu.call();
+			} catch (InstantiationException | IllegalAccessException | IOException e1) {
+				e1.printStackTrace();
+			}
+		}
+		else fp = (new ImagePlus(imPath).getProcessor());
 		
 		if(Boolean.parseBoolean(params.getValueOfParameter("Auto Threshold On?"))) {
-			ByteProcessor imp = (ByteProcessor) im.getProcessor().convertToByte(true);
+			ByteProcessor imp = (ByteProcessor) fp.convertToByte(true);
 			int[] histogram = imp.getHistogram();
 			function.imageUtility.AutoThresholder thresholder = new function.imageUtility.AutoThresholder();
 			threshold = 256*thresholder.getThreshold(this.params.getValueOfParameter("Auto Threshold Method"), histogram);
@@ -365,7 +379,20 @@ class FindMaxHelperFunction2 implements GraphicalCrunchingEnabling, ImagePanelIn
 		int threshold = Integer.parseInt(params.getValueOfParameter("Threshold"));
 		DimensionMap map = dimensions.get(index);
 		String imPath = images.get(map);
-		ImagePlus im = new ImagePlus(imPath);
+		
+		ImagePlus im = null;
+		
+		if(!imset.hasVirtualFunctionFlavor()) im = new ImagePlus(imPath);
+		else {
+			try {
+				VirtualFunctionUtility vfu = new VirtualFunctionUtility(imPath);
+				ImageProcessor ip = vfu.call();
+				im = new ImagePlus("Virtual Image",ip);
+				
+			} catch (InstantiationException | IllegalAccessException | IOException e1) {
+				e1.printStackTrace();
+			}
+		}
 		
 		if(Boolean.parseBoolean(params.getValueOfParameter("Auto Threshold On?"))) {
 			ByteProcessor imp = (ByteProcessor) im.getProcessor().convertToByte(true);

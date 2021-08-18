@@ -1,5 +1,6 @@
 package function.plugin.old;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.TreeMap;
 
@@ -12,6 +13,7 @@ import Database.Definition.ParameterSet;
 import Database.Definition.TypeName;
 import Database.SingleUserDatabase.JEXWriter;
 import function.JEXCrunchable;
+import function.imageUtility.VirtualFunctionUtility;
 import function.plugin.plugins.imageProcessing.GaussianBlur2;
 import function.plugin.plugins.imageProcessing.GaussianBlurForcedRadius;
 import function.plugin.plugins.imageProcessing.RankFilters2;
@@ -164,6 +166,7 @@ public class JEX_ImageFilters extends JEXCrunchable {
 		Parameter p4 = getNumThreadsParameter(10, 6);
 		Parameter p5 = new Parameter("Post-math Operation", "Choose a post math operation to perform if desired. Otherwise, leave as 'None'.", Parameter.DROPDOWN, new String[] { OP_NONE, OP_LOG, OP_EXP, OP_SQRT, OP_SQR, OP_INVERT}, 0);
 		Parameter p6 = new Parameter("Post-multiplier", "Value to multiply by after processing and any math operation and before saving.", "1.0");
+		Parameter p9 = new Parameter("Virtual Output","Check to make the output virtual (does not save output image)",Parameter.CHECKBOX, false);
 		// Make an array of the parameters and return it
 		ParameterSet parameterArray = new ParameterSet();
 		parameterArray.addParameter(p4);
@@ -174,6 +177,7 @@ public class JEX_ImageFilters extends JEXCrunchable {
 		parameterArray.addParameter(p6);
 		parameterArray.addParameter(p7);
 		parameterArray.addParameter(p8);
+		parameterArray.addParameter(p9);
 
 		return parameterArray;
 	}
@@ -251,6 +255,13 @@ public class JEX_ImageFilters extends JEXCrunchable {
 			{
 				return false;
 			}
+			if(Boolean.parseBoolean(parameters.getValueOfParameter("Virtual Output"))) {
+				TreeMap<String,String> inputs1 = new TreeMap<String,String>();
+				inputs1.put("Image",imageMap.get(map));
+				String virtualImagePath = JEXWriter.saveVirtualImage(inputs1,parameters.getParametersTree(),"ImageFilter");
+				outputImageMap.put(map.copy(),virtualImagePath);
+				continue;
+			}
 			
 			if(filterTable.testMapAsExclusionFilter(map))
 			{
@@ -266,8 +277,16 @@ public class JEX_ImageFilters extends JEXCrunchable {
 				continue;
 			}
 			
-			ImagePlus im = new ImagePlus(imageMap.get(map));
-			ImageProcessor ip = im.getProcessor().convertToFloat();
+			ImageProcessor ip = null;
+			if(imageData.hasVirtualFunctionFlavor()) {
+				try {
+					VirtualFunctionUtility vfu = new VirtualFunctionUtility(imageMap.get(map));
+					ip = vfu.call().convertToFloat();
+				} catch (InstantiationException | IllegalAccessException | IOException e1) {
+					e1.printStackTrace();
+				}
+			}
+			else ip = (new ImagePlus(imageMap.get(map)).getProcessor().convertToFloat());
 			ImageProcessor orig = null;
 			
 			if(method.equals(OPEN_TOPHAT) || method.equals(CLOSE_TOPHAT) || method.equals(SNR) || method.equals(NSR) || method.equals(DOG))
@@ -428,7 +447,7 @@ public class JEX_ImageFilters extends JEXCrunchable {
 		}
 
 		JEXData output1 = ImageWriter.makeImageStackFromPaths(outputNames[0].getName(), outputImageMap);
-
+		if(Boolean.parseBoolean(parameters.getValueOfParameter("Virtual Output"))) output1.setDataObjectFlavor("Virtual Function");
 		// Set the outputs
 		realOutputs.add(output1);
 

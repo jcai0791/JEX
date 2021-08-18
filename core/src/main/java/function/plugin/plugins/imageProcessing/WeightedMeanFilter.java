@@ -1,15 +1,21 @@
 package function.plugin.plugins.imageProcessing;
 
+import java.io.IOException;
+import java.lang.reflect.Field;
+import java.util.List;
 import java.util.Map.Entry;
 import java.util.TreeMap;
 
 import org.scijava.plugin.Plugin;
+import org.scijava.util.ClassUtils;
 
 import Database.DBObjects.JEXData;
 import Database.DBObjects.JEXEntry;
 import Database.DataReader.ImageReader;
 import Database.DataWriter.ImageWriter;
+import Database.Definition.Parameter;
 import Database.SingleUserDatabase.JEXWriter;
+import function.imageUtility.VirtualFunctionUtility;
 import function.plugin.mechanism.InputMarker;
 import function.plugin.mechanism.JEXPlugin;
 import function.plugin.mechanism.MarkerConstants;
@@ -119,6 +125,9 @@ public class WeightedMeanFilter extends JEXPlugin {
 	
 	@ParameterMarker(uiOrder=17, name="IF is One Tile?", description="Is the (optional) IF image provided a single tile (vs one large stitched IF image)?", ui=MarkerConstants.UI_CHECKBOX, defaultBoolean=false)
 	boolean oneTile;
+	
+	@ParameterMarker(uiOrder=99, name="Virtual Output", description="Check to make the output virtual (does not save output image)", ui=MarkerConstants.UI_CHECKBOX, defaultBoolean=false)
+	boolean virtualOutput;
 
 	//	@ParameterMarker(uiOrder=12, name="Output Std. Dev. Images?", description="Should the locally weighted standard deviation images be output?", ui=MarkerConstants.UI_CHECKBOX, defaultBoolean = false)
 	//	boolean outputStdDev;
@@ -190,6 +199,8 @@ public class WeightedMeanFilter extends JEXPlugin {
 			doDivision = true;
 		}
 		
+		
+		
 		// Run the function
 		TreeMap<DimensionMap,String> imageMap = ImageReader.readObjectToImagePathTable(imageData);
 		TreeMap<DimensionMap,String> maskMap = null;
@@ -214,7 +225,51 @@ public class WeightedMeanFilter extends JEXPlugin {
 				Logs.log("Function canceled.", this);
 				return false;
 			}
-
+			
+			//This is for handling virtual outputs
+			if(this.virtualOutput) {
+				List<Field> parameterList = ClassUtils.getAnnotatedFields(this.getClass(), ParameterMarker.class);
+				TreeMap<String,Parameter> parameters = new TreeMap<String,Parameter>();
+				for(Field f : parameterList) {
+					f.setAccessible(true); // expose private fields					
+					// Get the marker
+					final ParameterMarker parameter = f.getAnnotation(ParameterMarker.class);
+					
+					// add items to the relevant lists
+					String name = parameter.name();
+					String description = parameter.description();
+					int ui = parameter.ui();
+					String defaultText = parameter.defaultText();
+					Boolean defaultBoolean = parameter.defaultBoolean();
+					int defaultChoice = parameter.defaultChoice();
+					String[] choices = parameter.choices();
+					
+					Parameter p = null;
+					if(ui == Parameter.CHECKBOX)
+					{
+						p = new Parameter(name, description, ui, defaultBoolean);
+					}
+					else if(ui == Parameter.DROPDOWN)
+					{
+						p = new Parameter(name, description, ui, choices, defaultChoice);
+					}
+					else
+					{ // Filechooser, Password, or Textfield
+						p = new Parameter(name, description, ui, defaultText);
+					}
+					
+					parameters.put(name,p);
+				}
+				TreeMap<String,String> inputs = new TreeMap<String,String>();
+				inputs.put("Image",imageMap.get(map));
+				if(maskData!=null)inputs.put("Mask (optional)",maskMap.get(map));
+				if(IFData!=null) inputs.put("IF (optional)",IFMap.get(map));
+				String virtualImagePath = JEXWriter.saveVirtualImage(inputs,parameters,"WeightedMeanFilter");
+				outputImageMap.put(map.copy(),virtualImagePath);
+				continue;
+			}
+			
+			
 			// Skip if told to skip.
 			if(filterTable.testMapAsExclusionFilter(map))
 			{
@@ -248,7 +303,16 @@ public class WeightedMeanFilter extends JEXPlugin {
 				continue;
 			}
 			
-			FloatProcessor fp = (new ImagePlus(imageMap.get(map)).getProcessor().convertToFloatProcessor());
+			FloatProcessor fp = null;
+			if(imageData.hasVirtualFunctionFlavor()) {
+				try {
+					VirtualFunctionUtility vfu = new VirtualFunctionUtility(imageMap.get(map));
+					fp = vfu.call().convertToFloatProcessor();
+				} catch (InstantiationException | IllegalAccessException | IOException e1) {
+					e1.printStackTrace();
+				}
+			}
+			else fp = (new ImagePlus(imageMap.get(map)).getProcessor().convertToFloatProcessor());
 			FloatProcessor mp = null;
 			if(maskData != null && maskMap != null)
 			{
@@ -321,7 +385,9 @@ public class WeightedMeanFilter extends JEXPlugin {
 				}
 				else
 				{
+					long start = System.currentTimeMillis();
 					Pair<FloatProcessor, ImageProcessor> images = ImageUtility.getWeightedMeanFilterImage((FloatProcessor) e.getValue(), doThreshold, doSubtraction, doBackgroundOnly, doDivision, 0.4*this.meanRadius, this.varRadius, this.subScale, this.threshScale, 0d, sigma, this.darkfield, this.meanOuterRadius);
+					long mid2 = System.currentTimeMillis();
 					if(images.p1 != null)
 					{
 						if(IFTiles.get(e.getKey()) != null)
@@ -330,7 +396,11 @@ public class WeightedMeanFilter extends JEXPlugin {
 							blit.copyBits(IFTiles.get(e.getKey()), 0, 0, Blitter.DIVIDE);
 						}
 						images.p1.add(nominal);
+						long mid = System.currentTimeMillis();
 						String filteredImagePath = JEXWriter.saveImage(images.p1, this.outputBitDepth);
+						long end = System.currentTimeMillis();
+						Logs.log("Saving took "+(end-mid)+" milliseconds", this);
+						Logs.log("Processing took "+(mid2-start)+" milliseconds", this);
 						outputImageMap.put(e.getKey().copy(), filteredImagePath);
 					}
 					if(images.p2 != null)
@@ -352,12 +422,14 @@ public class WeightedMeanFilter extends JEXPlugin {
 		if(outputImageMap.size() > 0)
 		{
 			this.output = ImageWriter.makeImageStackFromPaths("temp",outputImageMap);
+			if(this.virtualOutput) this.output.setDataObjectFlavor("Virtual Function");
 		}
 
 		// Save a threshold image if necessary
 		if(outputMaskMap.size() > 0)
 		{
 			this.maskOutput = ImageWriter.makeImageStackFromPaths("temp", outputMaskMap);
+			if(this.virtualOutput) this.maskOutput.setDataObjectFlavor("Virtual Function");
 		}
 
 		// Return status
