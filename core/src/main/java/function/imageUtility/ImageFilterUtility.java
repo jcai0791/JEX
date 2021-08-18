@@ -38,8 +38,8 @@ public class ImageFilterUtility extends VirtualFunctionCruncher{
 		String mathOp = parameters.getValueOfParameter("Post-math Operation");
 		double mult = Double.parseDouble(parameters.getValueOfParameter("Post-multiplier"));
 
-		ImagePlus im = new ImagePlus(inputs.get("Image"));
-		ImageProcessor ip = im.getProcessor().convertToFloat();
+
+		ImageProcessor ip = inputs.get("Image");
 		ImageProcessor orig = null;
 
 		if(method.equals(OPEN_TOPHAT) || method.equals(CLOSE_TOPHAT) || method.equals(SNR) || method.equals(NSR) || method.equals(DOG))

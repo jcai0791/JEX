@@ -140,29 +140,24 @@ public class WeightedMeanFilterUtility extends VirtualFunctionCruncher{
 
 
 		// Run the function
-		String image = inputs.get("Image");
-		String mask = null;
+		ImageProcessor image = inputs.get("Image");
+		ImageProcessor mask = null;
 		if(inputs.containsKey("Mask (optional)")) mask = inputs.get("Mask (optional)");
-		String IF = null;
+		ImageProcessor IF = null;
 		if(inputs.containsKey("IF (optional)")) IF = inputs.get("IF (optional)");
-		TreeMap<DimensionMap,String> outputImageMap = new TreeMap<DimensionMap,String>();
-		TreeMap<DimensionMap,String> outputMaskMap = new TreeMap<DimensionMap,String>();
-		//TreeMap<DimensionMap,String> outputStDevMap = new TreeMap<DimensionMap,String>();
+		
 
 
-		//This is for handling virtual outputs
-
-
-		FloatProcessor fp = (new ImagePlus(image).getProcessor().convertToFloatProcessor());
+		FloatProcessor fp = (image.convertToFloatProcessor());
 		FloatProcessor mp = null;
 		if(mask != null)
 		{
-			mp = (new ImagePlus(mask).getProcessor().convertToFloatProcessor());
+			mp = (mask.convertToFloatProcessor());
 		}
 		FloatProcessor IFp = null;
 		if(IF != null)
 		{
-			IFp = (new ImagePlus(IF).getProcessor().convertToFloatProcessor());
+			IFp = (IF.convertToFloatProcessor());
 		}
 		
 		DimensionMap map = new DimensionMap();

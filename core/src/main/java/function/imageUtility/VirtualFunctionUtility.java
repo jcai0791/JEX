@@ -8,6 +8,7 @@ import Database.SingleUserDatabase.JEXWriter;
 import cruncher.VirtualFunctionCruncher;
 import function.JEXCrunchable;
 import ij.ImagePlus;
+import ij.process.FloatProcessor;
 import ij.process.ImageProcessor;
 import logs.Logs;
 
@@ -26,6 +27,21 @@ import org.scijava.util.Types;
 public class VirtualFunctionUtility{
 
 	public VirtualFunctionCruncher function;
+	
+	/**
+	 * Format for adding virtual function support:
+	 * 
+	 * FloatProcessor fp = null;
+			if(imageData.hasVirtualFunctionFlavor()) {
+				try {
+					VirtualFunctionUtility vfu = new VirtualFunctionUtility(imageMap.get(map));
+					fp = vfu.call().convertToFloatProcessor();
+				} catch (InstantiationException | IllegalAccessException | IOException e1) {
+					e1.printStackTrace();
+				}
+			}
+			else fp = (new ImagePlus(imageMap.get(map)).getProcessor().convertToFloatProcessor());
+	 */
 
 	public VirtualFunctionUtility(String vfcPath) throws InstantiationException, IllegalAccessException, IOException
 	{

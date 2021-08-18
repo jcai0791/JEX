@@ -1,10 +1,16 @@
 package cruncher;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.TreeMap;
 
 import Database.Definition.Parameter;
 import Database.Definition.ParameterSet;
+import Database.SingleUserDatabase.JEXWriter;
+import function.imageUtility.VirtualFunctionUtility;
+import ij.ImagePlus;
 import ij.process.ImageProcessor;
+import logs.Logs;
 
 public abstract class VirtualFunctionCruncher {
 	public String functionName;
@@ -13,7 +19,7 @@ public abstract class VirtualFunctionCruncher {
 	public ImageProcessor output;
 
 	//input image path
-	public TreeMap<String,String> inputs;
+	public TreeMap<String,ImageProcessor> inputs = new TreeMap<String,ImageProcessor>();
 	
 	public abstract void initializeParameters();
 	
@@ -43,8 +49,24 @@ public abstract class VirtualFunctionCruncher {
 		this.output = ip;
 	}
 	
-	public void setInputs(TreeMap<String,String> inputs) {
-		this.inputs = inputs;
+	public void setInputs(TreeMap<String,String> inputPaths) {
+		for(String inputName : inputPaths.keySet()) {
+			String inputPath = inputPaths.get(inputName);
+			
+			if(inputPath.endsWith("vfn")) {
+				try {
+					VirtualFunctionUtility vfc = new VirtualFunctionUtility(inputPath);
+					inputs.put(inputName,vfc.call());
+					
+				} catch (InstantiationException | IllegalAccessException | IOException e) {
+					e.printStackTrace();
+				}
+			}
+			else {
+				Logs.log("Path is: "+inputPath, this);
+				inputs.put(inputName,new ImagePlus(inputPath).getProcessor());
+			}
+		}
 	}
 	
 
