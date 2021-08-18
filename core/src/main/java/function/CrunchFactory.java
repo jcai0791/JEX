@@ -376,8 +376,7 @@ public class CrunchFactory extends URLClassLoader {
 				{
 					String packageName = names[names.length - 2];
 					String name = names[names.length - 1];
-					if(packageName.equals("old") && name.length() >= 4 && name.startsWith("JEX_") && name.endsWith(".class")
-							//&& !name.contains("$")
+					if(packageName.equals("old") && name.length() >= 4 && name.startsWith("JEX_") && name.endsWith(".class")&& !name.contains("$")
 							)
 					{
 						// Need to check for $ because those represent class files that are extra created by Eclipse that won't work
