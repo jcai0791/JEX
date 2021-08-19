@@ -53,7 +53,6 @@ public class JEXDataUpdate implements Update {
 		// destination for all changes to ensure that the destination can be
 		// overwritten.
 		Type type = data.getTypeName().getType();
-		Logs.log("Name: "+data.getTypeName().getName(), this);
 		Session session = JEXStatics.fileManager.session();
 		String dbFolder = JEXWriter.getDatabaseFolder();
 		String dataFolderRelativePath = JEXWriter.getDataFolder(data, true);
@@ -65,10 +64,8 @@ public class JEXDataUpdate implements Update {
 			TreeMap<DimensionMap,JEXDataSingle> datamap = updatedData.getDataMap();
 			for (DimensionMap map : datamap.keySet())
 			{
-				Logs.log("A", this);
 				if(!type.hasFlavor(JEXData.FLAVOR_VIRTUAL_FUNCTION)&&type.hasFlavor(JEXData.FLAVOR_VIRTUAL))
 				{
-					Logs.log("Here", this);
 					// Then purposely skip as we want to reference a file outside the database.
 					continue;
 				}
