@@ -1,20 +1,6 @@
 package function.imageUtility;
 
-import Database.DBObjects.JEXData;
-import Database.Definition.Parameter;
-import Database.Definition.ParameterSet;
-import Database.Definition.TypeName;
-import Database.SingleUserDatabase.JEXWriter;
-import cruncher.VirtualFunctionCruncher;
-import function.JEXCrunchable;
-import ij.ImagePlus;
-import ij.process.FloatProcessor;
-import ij.process.ImageProcessor;
-import logs.Logs;
-
 import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -22,7 +8,9 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.TreeMap;
 
-import org.scijava.util.Types;
+import cruncher.VirtualFunctionCruncher;
+import ij.process.ImageProcessor;
+import logs.Logs;
 
 public class VirtualFunctionUtility{
 
@@ -46,7 +34,7 @@ public class VirtualFunctionUtility{
 	public VirtualFunctionUtility(String vfcPath) throws InstantiationException, IllegalAccessException, IOException
 	{
 		Logs.log("Reading from: "+vfcPath, this);
-		BufferedReader reader = new BufferedReader(new FileReader(JEXWriter.getDatabaseFolder() + File.separator + vfcPath));
+		BufferedReader reader = new BufferedReader(new FileReader(vfcPath));
 		String functionName = reader.readLine().split(",")[0];
 		
 		//Put new functions here

@@ -1,15 +1,13 @@
 package Database.DBObjects;
 
-import Database.Definition.Type;
-import Database.Definition.TypeName;
-import Database.SingleUserDatabase.JEXDataIO;
-import cruncher.JEXFunction;
-import function.imageUtility.VirtualFunctionUtility;
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.TreeMap;
 
+import Database.Definition.Type;
+import Database.Definition.TypeName;
+import Database.SingleUserDatabase.JEXDataIO;
+import function.imageUtility.VirtualFunctionUtility;
 import logs.Logs;
 import miscellaneous.CSVList;
 import miscellaneous.DateUtility;
@@ -263,7 +261,7 @@ public class JEXData {
 	
 	public boolean hasVirtualFlavor()
 	{
-		return this.hasFlavor(FLAVOR_VIRTUAL);
+		return !this.hasVirtualFunctionFlavor()&&this.hasFlavor(FLAVOR_VIRTUAL);
 	}
 	
 	public boolean hasVirtualFunctionFlavor()
