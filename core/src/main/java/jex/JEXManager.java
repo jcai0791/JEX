@@ -110,6 +110,7 @@ public class JEXManager {
 	
 	// User name info
 	private String userName = null;
+	private String currentUserFile = null;
 	
 	// Databases available for each repository
 	private TreeMap<Repository,JEXDBInfo[]> databases = null;
@@ -285,7 +286,7 @@ public class JEXManager {
 	public boolean logOn(File userFile)
 	{
 		this.reset();
-		
+		this.currentUserFile = userFile.getAbsolutePath();
 		// Change username and send signal
 		Logs.log("Triggering new database creation", 1, this);
 		this.userName = FileUtility.getFileNameWithoutExtension(userFile.getName());
@@ -489,6 +490,13 @@ public class JEXManager {
 		CSVList csv = new CSVList(fileCSV);
 		String[] result = csv.toStringArray();
 		return result;
+	}
+	
+	/**
+	 * Get current user
+	 */
+	public String getCurrentUserFile() {
+		return this.currentUserFile;
 	}
 	
 	// ---------------------------------------------

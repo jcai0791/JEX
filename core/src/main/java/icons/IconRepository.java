@@ -31,6 +31,8 @@ public class IconRepository {
 	public static String INFO_MAGNIFY = "Info.png";
 	public static String ADD = "Add.png";
 	
+	
+	public static String BUTTON_BACK = "Back.png";
 	public static String BUTTON_FORWARD = "ButtonFWD.png";
 	
 	public static String MAIN_CREATE_SELECTED = "MenuCreate.png";
