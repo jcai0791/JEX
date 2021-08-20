@@ -368,6 +368,8 @@ public class JEX_FindMaximaSegmentation extends JEXCrunchable {
 					// Counting will be messed up now for the progress bar but hard to remedy
 					continue;
 				}
+				
+				//Virtual Function support
 				ImagePlus im = new ImagePlus(pathToGet);
 				FloatProcessor ip = null;
 				if(imageData.hasVirtualFunctionFlavor()) {
