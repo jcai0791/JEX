@@ -68,7 +68,7 @@ public class JEX_ConvertNISElementsTiffs extends JEXCrunchable {
 	@Override
 	public String getInfo()
 	{
-		String result = "Conver images from a NIS Elements ND Acquisition (multiple, colors, times, locations, large image arrays... no Z stacks yet) from stacks to individual images";
+		String result = "Convert images from a NIS Elements ND Acquisition (multiple, colors, times, locations, large image arrays... no Z stacks yet) from stacks to individual images";
 		return result;
 	}
 	
