@@ -36,6 +36,9 @@ import javax.swing.UIManager.LookAndFeelInfo;
 import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.WindowConstants;
 
+import com.formdev.flatlaf.FlatIntelliJLaf;
+import com.formdev.flatlaf.FlatLightLaf;
+
 import Database.SingleUserDatabase.JEXDBIO;
 import cruncher.Cruncher;
 import guiObject.SignalMenuButton;
@@ -43,6 +46,7 @@ import icons.IconRepository;
 import jex.jexTabPanel.JEXTabPanelController;
 import jex.jexTabPanel.creationPanel.JEXCreationPanelController;
 import jex.jexTabPanel.jexDistributionPanel.JEXDistributionPanelController;
+import jex.jexTabPanel.jexFunctionPanel.JEXFunctionPanel;
 import jex.jexTabPanel.jexFunctionPanel.JEXFunctionPanelController;
 import jex.jexTabPanel.jexLabelPanel.JEXLabelPanelController;
 import jex.jexTabPanel.jexPluginPanel.JEXPluginPanelController;
@@ -304,6 +308,7 @@ public class JEXperiment extends JFrame implements ActionListener, WindowListene
 	 */
 	public void createMenuBar()
 	{
+		this.setWaitingCursor(true);
 		int spacing = 8;
 		this.menuPane.setBackground(DisplayStatics.menuBackground);
 		this.menuPane.setPreferredSize(new Dimension(300, 60));
@@ -507,6 +512,7 @@ public class JEXperiment extends JFrame implements ActionListener, WindowListene
 
 		this.menuPane.add(Box.createHorizontalStrut(spacing));
 		this.menuPane.add(Box.createHorizontalStrut(spacing));
+		this.setWaitingCursor(false);
 	}
 
 	public void unselectedAllIcons()
@@ -549,6 +555,7 @@ public class JEXperiment extends JFrame implements ActionListener, WindowListene
 
 	public void displayCreationPane()
 	{
+		this.setWaitingCursor(true);
 		// Reset views
 		this.resetViews();
 
@@ -574,11 +581,12 @@ public class JEXperiment extends JFrame implements ActionListener, WindowListene
 		this.changeMainView(JEXStatics.creationPane.getMainPanel());
 		this.changeLeftView(JEXStatics.creationPane.getLeftPanel());
 		this.changeRightView(JEXStatics.creationPane.getRightPanel());
-
+		this.setWaitingCursor(false);
 	}
 
 	public void displayDistributionPane()
 	{
+		this.setWaitingCursor(true);
 		// if(JEXStatics.currentPane != null)
 		// JEXStatics.currentPane.saveSplitPaneOptions(centerSplitPane);
 		// JEXStatics.currentPane = JEXStatics.distribPane;
@@ -589,7 +597,14 @@ public class JEXperiment extends JFrame implements ActionListener, WindowListene
 		this.resetViews();
 
 		// Create a contoller
-		JEXDistributionPanelController distribPane = new JEXDistributionPanelController();
+		JEXDistributionPanelController distribPane = null;
+		try {
+			distribPane = new JEXDistributionPanelController();
+		}catch(Exception e) {
+			JEXStatics.statusBar.setStatusText("No dataset found");
+			this.setWaitingCursor(false);
+			return;
+		}
 		JEXStatics.distribPane = distribPane;
 
 		// set current pane
@@ -610,10 +625,12 @@ public class JEXperiment extends JFrame implements ActionListener, WindowListene
 		this.changeMainView(JEXStatics.distribPane.getMainPanel());
 		this.changeLeftView(JEXStatics.distribPane.getLeftPanel());
 		this.changeRightView(JEXStatics.distribPane.getRightPanel());
+		this.setWaitingCursor(false);
 	}
 
 	public void displayLabelPane()
 	{
+		this.setWaitingCursor(true);
 		// if(JEXStatics.currentPane != null)
 		// JEXStatics.currentPane.saveSplitPaneOptions(centerSplitPane);
 		// JEXStatics.currentPane = JEXStatics.labelPane;
@@ -645,10 +662,12 @@ public class JEXperiment extends JFrame implements ActionListener, WindowListene
 		this.changeMainView(JEXStatics.labelPane.getMainPanel());
 		this.changeLeftView(JEXStatics.labelPane.getLeftPanel());
 		this.changeRightView(JEXStatics.labelPane.getRightPanel());
+		this.setWaitingCursor(false);
 	}
 
 	public void displayViewPane()
 	{
+		this.setWaitingCursor(true);
 		// Reset views
 		this.resetViews();
 
@@ -674,11 +693,12 @@ public class JEXperiment extends JFrame implements ActionListener, WindowListene
 		this.changeMainView(JEXStatics.viewPane.getMainPanel());
 		this.changeLeftView(JEXStatics.viewPane.getLeftPanel());
 		this.changeRightView(JEXStatics.viewPane.getRightPanel());
-
+		this.setWaitingCursor(false);
 	}
 
 	public void displayFunctionPane()
 	{
+		this.setWaitingCursor(true);
 		// if(JEXStatics.currentPane != null)
 		// JEXStatics.currentPane.saveSplitPaneOptions(centerSplitPane);
 		// JEXStatics.currentPane = JEXStatics.functionPane;
@@ -712,10 +732,18 @@ public class JEXperiment extends JFrame implements ActionListener, WindowListene
 		this.changeMainView(JEXStatics.functionPane.getMainPanel());
 		this.changeLeftView(JEXStatics.functionPane.getLeftPanel());
 		this.changeRightView(JEXStatics.functionPane.getRightPanel());
+		this.setWaitingCursor(false);
+//		
+//		try{
+//			File f = new File(PrefsUtility.getWorkflowLocation());
+//			((JEXFunctionPanel) JEXStatics.functionPane.getMainPanel()).loadWorkflowFile(f);
+//		} catch(Exception e) {Logs.log("No workflow file found", this);}
+		
 	}
 
 	public void displayPluginsPane()
 	{
+		this.setWaitingCursor(true);
 		// if(JEXStatics.currentPane != null)
 		// JEXStatics.currentPane.saveSplitPaneOptions(centerSplitPane);
 		// JEXStatics.currentPane = JEXStatics.pluginPane;
@@ -747,6 +775,7 @@ public class JEXperiment extends JFrame implements ActionListener, WindowListene
 		this.changeMainView(JEXStatics.pluginPane.getMainPanel());
 		this.changeLeftView(JEXStatics.pluginPane.getLeftPanel());
 		this.changeRightView(JEXStatics.pluginPane.getRightPanel());
+		this.setWaitingCursor(false);
 	}
 
 	/**
@@ -754,6 +783,7 @@ public class JEXperiment extends JFrame implements ActionListener, WindowListene
 	 */
 	public void displayStatisticsPane()
 	{
+		this.setWaitingCursor(true);
 		// if(JEXStatics.currentPane != null)
 		// JEXStatics.currentPane.saveSplitPaneOptions(centerSplitPane);
 
@@ -783,6 +813,7 @@ public class JEXperiment extends JFrame implements ActionListener, WindowListene
 		this.changeMainView(JEXStatics.statPane.getMainPanel());
 		this.changeLeftView(JEXStatics.statPane.getLeftPanel());
 		this.changeRightView(JEXStatics.statPane.getRightPanel());
+		this.setWaitingCursor(false);
 	}
 
 	public void resetViews()
@@ -897,7 +928,7 @@ public class JEXperiment extends JFrame implements ActionListener, WindowListene
 			pane.setVisible(false);
 			return true;
 		}
-
+		
 	}
 
 	/**
@@ -907,6 +938,7 @@ public class JEXperiment extends JFrame implements ActionListener, WindowListene
 	 */
 	public void openUser(File file)
 	{
+		this.setWaitingCursor(true);
 		Logs.log("Opening user file " + file.getName(), 0, this);
 
 		// Load the user file
@@ -918,6 +950,7 @@ public class JEXperiment extends JFrame implements ActionListener, WindowListene
 
 		// Change the panel
 		JEXStatics.main.displayViewPane();
+		this.setWaitingCursor(false);
 	}
 
 	// ----------------------------------------------------
@@ -929,9 +962,11 @@ public class JEXperiment extends JFrame implements ActionListener, WindowListene
 	 */
 	public void quit()
 	{
+		this.setWaitingCursor(true);
 		R.close();
 		this.dispose();
 		System.exit(0);
+		this.setWaitingCursor(false);
 	}
 
 	/**
@@ -939,11 +974,13 @@ public class JEXperiment extends JFrame implements ActionListener, WindowListene
 	 */
 	public void save()
 	{
+		this.setWaitingCursor(true);
 		Logs.log("Saving requested", 1, this);
 		// String consolidateStr =
 		// JEXStatics.userPreferences.get("Consolidate Database", "false");
 		// Boolean consolidate = Boolean.parseBoolean(consolidateStr);
 		JEXStatics.jexManager.saveCurrentDatabase();
+		this.setWaitingCursor(false);
 	}
 
 	/**
@@ -951,12 +988,14 @@ public class JEXperiment extends JFrame implements ActionListener, WindowListene
 	 */
 	public void update()
 	{
+		this.setWaitingCursor(true);
 		Logs.log("Update requested", 1, this);
 		// String consolidateStr =
 		// JEXStatics.userPreferences.get("Consolidate Database", "false");
 		// Boolean consolidate = Boolean.parseBoolean(consolidateStr);
 		JEXStatics.statusBar.setStatusText("Attempting to update JEX...");
 		Updater.attemptJEXUpdate();
+		this.setWaitingCursor(false);
 	}
 
 	/**
@@ -964,6 +1003,7 @@ public class JEXperiment extends JFrame implements ActionListener, WindowListene
 	 */
 	public void openPreferences()
 	{
+		this.setWaitingCursor(true);
 		// Reload from file to get rid of any unsaved changes
 		PrefsUtility.reloadPrefs();
 		XPreferencePanelController prefs = new XPreferencePanelController(PrefsUtility.getUserPrefs(), true);
@@ -975,13 +1015,18 @@ public class JEXperiment extends JFrame implements ActionListener, WindowListene
 		SSCenter.defaultCenter().connect(prefs, XPreferencePanelController.SIG_Cancel_NULL, this, "cancelPrefs", (Class[]) null);
 		this.prefsDialog.setSize(500, 500);
 		this.prefsDialog.setVisible(true);
-
+		this.setWaitingCursor(false);
 	}
 
+	/**
+	 * 
+	 */
 	public void cleanDB()
 	{
+		this.setWaitingCursor(true);
 		//this.displayFunctionPane();
 		JEXDBIO.cleanDB(JEXStatics.jexManager.getCurrentDatabase());
+		this.setWaitingCursor(false);
 	}
 
 	/**
@@ -989,6 +1034,7 @@ public class JEXperiment extends JFrame implements ActionListener, WindowListene
 	 */
 
 	public void backToDatabase() {
+		this.setWaitingCursor(true);
 		Logs.log("Going back", this);
 		JEXStatics.main.showLogOnFrame(false);
 		JEXStatics.main.showDatabaseChooserFrame(true);
@@ -997,6 +1043,7 @@ public class JEXperiment extends JFrame implements ActionListener, WindowListene
 		JEXStatics.jexManager.logOn(new File(userFile));
 		this.resetViews();
 		this.repaint();
+		this.setWaitingCursor(false);
 	}
 
 
@@ -1162,18 +1209,39 @@ public class JEXperiment extends JFrame implements ActionListener, WindowListene
 				UIManager.put("Tree.font", font);
 				UIManager.put("Label.font", font);
 				JEXperiment jex = new jex.JEXperiment();
-				for (LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
-					if ("Nimbus".equals(info.getName())) {
-						try {
-							UIManager.setLookAndFeel(info.getClassName());
-						} catch (ClassNotFoundException | InstantiationException | IllegalAccessException
-								| UnsupportedLookAndFeelException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-						}
-						break;
-					}
+				
+				
+				//FlatLight
+				FlatIntelliJLaf.install();
+				try {
+				    UIManager.setLookAndFeel( new FlatIntelliJLaf() );
+				} catch( Exception ex ) {
+				    System.err.println( "Failed to initialize LaF" );
 				}
+				
+//				//Seaglass
+//				try {
+//					UIManager.setLookAndFeel("com.seaglasslookandfeel.SeaGlassLookAndFeel");
+//				} catch (ClassNotFoundException | InstantiationException | IllegalAccessException
+//						| UnsupportedLookAndFeelException e) {
+//					// TODO Auto-generated catch block
+//					e.printStackTrace();
+//				}
+				
+//				//Nimbus
+//				for (LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
+//					if ("Nimbus".equals(info.getName())) {
+//						try {
+//							UIManager.setLookAndFeel(info.getClassName());
+//						} catch (ClassNotFoundException | InstantiationException | IllegalAccessException
+//								| UnsupportedLookAndFeelException e) {
+//							// TODO Auto-generated catch block
+//							e.printStackTrace();
+//						}
+//						break;
+//					}
+//				}
+				
 				if(args != null && args.length > 0)
 				{
 					String arg1 = args[0];
