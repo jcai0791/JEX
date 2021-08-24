@@ -13,7 +13,7 @@ public abstract class JEXTabPanelController {
 	public static String CLOSE_TAB = "CLOSE_TAB";
 	
 	public static int leftPanelWidth = 200;
-	public int fixedPanelWidth = 250;
+	public int fixedPanelWidth = 290;
 	public double resizeWeight = 1.0;
 	
 	public int getFixedPanelWidth()
