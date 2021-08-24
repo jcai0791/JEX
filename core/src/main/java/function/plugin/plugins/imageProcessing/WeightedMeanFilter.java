@@ -385,9 +385,7 @@ public class WeightedMeanFilter extends JEXPlugin {
 				}
 				else
 				{
-					long start = System.currentTimeMillis();
 					Pair<FloatProcessor, ImageProcessor> images = ImageUtility.getWeightedMeanFilterImage((FloatProcessor) e.getValue(), doThreshold, doSubtraction, doBackgroundOnly, doDivision, 0.4*this.meanRadius, this.varRadius, this.subScale, this.threshScale, 0d, sigma, this.darkfield, this.meanOuterRadius);
-					long mid2 = System.currentTimeMillis();
 					if(images.p1 != null)
 					{
 						if(IFTiles.get(e.getKey()) != null)
@@ -396,11 +394,7 @@ public class WeightedMeanFilter extends JEXPlugin {
 							blit.copyBits(IFTiles.get(e.getKey()), 0, 0, Blitter.DIVIDE);
 						}
 						images.p1.add(nominal);
-						long mid = System.currentTimeMillis();
 						String filteredImagePath = JEXWriter.saveImage(images.p1, this.outputBitDepth);
-						long end = System.currentTimeMillis();
-						Logs.log("Saving took "+(end-mid)+" milliseconds", this);
-						Logs.log("Processing took "+(mid2-start)+" milliseconds", this);
 						outputImageMap.put(e.getKey().copy(), filteredImagePath);
 					}
 					if(images.p2 != null)
