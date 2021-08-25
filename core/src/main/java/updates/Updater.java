@@ -17,6 +17,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
+import javax.swing.JOptionPane;
+
 import jex.statics.JEXDialog;
 import jex.statics.JEXStatics;
 import jex.statics.KeyStatics;
@@ -42,6 +44,8 @@ public class Updater {
 	
 	public static void attemptJEXUpdate()
 	{		
+		JOptionPane.showMessageDialog(null, "Updating is currently not working.\nFor the latest version, download the code from https://github.com/jcai0791/JEX\nNeed help or more info? Contact me at jbcai@wisc.edu", "Update Unavailable", JOptionPane.INFORMATION_MESSAGE);
+		if(runningFromJar) return;
 		JEXStatics.statusBar.setStatusText("Attempting to update JEX...");
 		// Check to see if we are running from an executable version of JEX
 		
