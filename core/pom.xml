@@ -16,11 +16,20 @@
 
 	<dependencies>
 		<dependency>
+			<groupId>com.seaglasslookandfeel</groupId>
+			<artifactId>seaglasslookandfeel</artifactId>
+			<version>0.2.1</version>
+		</dependency>
+		<dependency>
+			<groupId>com.formdev</groupId>
+			<artifactId>flatlaf</artifactId>
+			<version>1.5</version>
+		</dependency>
+		<dependency>
 			<groupId>ch.randelshofer</groupId>
 			<artifactId>monte-cc</artifactId>
 			<version>0.7.7</version>
 		</dependency>
-
 		<dependency>
 			<groupId>com.fifesoft</groupId>
 			<artifactId>rsyntaxtextarea</artifactId>
@@ -135,6 +144,7 @@
 		<dependency>
 			<groupId>net.imagej</groupId>
 			<artifactId>imagej-ops</artifactId>
+			<version>0.44.1-SNAPSHOT</version>
 		</dependency>
 
 		<!-- File Formats Support -->
