@@ -1,6 +1,7 @@
 package jex;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -503,6 +504,42 @@ public class JEXManager {
 	// Database managing
 	// ---------------------------------------------
 	
+	/**
+	 * Delete a Database
+	 */
+	public boolean deleteDatabase(JEXDBInfo info, Repository rep)
+	{
+		Logs.log("Deleting Database", 1, this);
+		
+		if(info == null)
+		{
+			return false;
+		}
+		try {
+			FileUtility.deleteDir(new File(info.getDirectory()));
+		} catch (IOException e) {
+			Logs.log("Could not delete database",this);
+		}
+		
+		JEXDBInfo[] dbs = this.databases.get(rep);
+		JEXDBInfo[] newDBs = new JEXDBInfo[dbs.length - 1];
+		int pointer = 0;
+		for (int i = 0; i < dbs.length; i++)
+		{
+			if(!dbs[i].getDBName().equals(info.getDBName())) {
+				newDBs[pointer] = dbs[i];
+				pointer++;
+			}
+		}
+		this.databases.put(rep, newDBs);
+		
+		
+		// Send a signal of change of repository list
+		Logs.log("Send signal of change of database list", 1, this);
+		SSCenter.defaultCenter().emit(this, DATABASES, (Object[]) null);
+		
+		return true;
+	}
 	/**
 	 * Create a new Database
 	 */

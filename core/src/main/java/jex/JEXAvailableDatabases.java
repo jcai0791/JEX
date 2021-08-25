@@ -234,6 +234,24 @@ public class JEXAvailableDatabases extends JPanel implements ActionListener, Mou
 		parent.setAlternatePanel(dbEditingPane);
 	}
 	
+	/**
+	 * Delete database with confirmation
+	 * 
+	 * @param db
+	 */
+	public void deleteDatabase(JEXDBInfo db, Repository rep)
+	{
+		Logs.log("Deleting database " + db.getDirectory(), 0, this);
+		
+		int dialogResult = JOptionPane.showConfirmDialog (null, "Are you sure you want to delete "+db.getDBName()+"?\nAll files will be deleted.","Warning",JOptionPane.YES_NO_OPTION);
+		if(dialogResult == JOptionPane.YES_OPTION){
+			JEXStatics.jexManager.deleteDatabase(db, rep);
+		}
+		
+		
+	}
+	
+	
 	// /**
 	// * Database clicked once
 	// * @param dbItem
@@ -554,6 +572,7 @@ public class JEXAvailableDatabases extends JPanel implements ActionListener, Mou
 		private JLabel infoLabel = new JLabel();
 		private SignalMenuButton dbButton = new SignalMenuButton();
 		private SignalMenuButton editDB = new SignalMenuButton();
+		private SignalMenuButton deleteDB = new SignalMenuButton();
 		private JPanel infoPane = new JPanel();
 		
 		/**
@@ -615,6 +634,12 @@ public class JEXAvailableDatabases extends JPanel implements ActionListener, Mou
 			editDB.setBackgroundColor(DisplayStatics.lightBackground);
 			editDB.addActionListener(this);
 			
+			Image delete = JEXStatics.iconRepository.getImageWithName(IconRepository.MISC_DELETE, 20, 20);
+			deleteDB.setText(null);
+			deleteDB.setImage(delete);
+			deleteDB.setBackgroundColor(DisplayStatics.lightBackground);
+			deleteDB.addActionListener(this);
+			
 			refresh();
 			
 			this.add(Box.createHorizontalStrut(28));
@@ -623,6 +648,8 @@ public class JEXAvailableDatabases extends JPanel implements ActionListener, Mou
 			this.add(infoPane);
 			this.add(Box.createHorizontalGlue());
 			this.add(editDB);
+			this.add(Box.createHorizontalStrut(5));
+			this.add(deleteDB);
 			this.add(Box.createHorizontalStrut(28));
 		}
 		
@@ -674,6 +701,11 @@ public class JEXAvailableDatabases extends JPanel implements ActionListener, Mou
 			{
 				Logs.log("Double click on database", 0, this);
 				openDatabase(database);
+			}
+			if(e.getSource() == deleteDB)
+			{
+				Logs.log("Deleting this database", 1, this);
+				deleteDatabase(database, rep);
 			}
 		}
 		
