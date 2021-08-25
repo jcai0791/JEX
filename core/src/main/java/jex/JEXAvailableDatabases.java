@@ -247,8 +247,6 @@ public class JEXAvailableDatabases extends JPanel implements ActionListener, Mou
 		if(dialogResult == JOptionPane.YES_OPTION){
 			JEXStatics.jexManager.deleteDatabase(db, rep);
 		}
-		
-		
 	}
 	
 	
