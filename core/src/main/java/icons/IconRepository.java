@@ -30,6 +30,7 @@ public class IconRepository {
 	public static String CROSS_WHITE = "CrossWhite.png";
 	public static String INFO_MAGNIFY = "Info.png";
 	public static String ADD = "Add.png";
+	public static String COPY = "Copy.png";
 	
 	
 	public static String BUTTON_BACK = "Back.png";
@@ -77,6 +78,7 @@ public class IconRepository {
 	public static String MAIN_UPDATE_CLICK = "Menu_Update_Pressed.png";
 	
 	public static String SESSION_DATABASE = "DataBase.png";
+	public static String SESSION_DATABASE_MOUSEOVER = "DataBase_MouseOver.png";
 	public static String SESSION_DATABASE_NEW = "DataBaseNew.png";
 	public static String SESSION_DATABASE_EDIT = "Info.png";
 	public static String SESSION_DATABASE_DELETE = "Delete.png";

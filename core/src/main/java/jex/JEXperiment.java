@@ -1034,6 +1034,7 @@ public class JEXperiment extends JFrame implements ActionListener, WindowListene
 	 */
 
 	public void backToDatabase() {
+		this.save();
 		this.setWaitingCursor(true);
 		Logs.log("Going back", this);
 		JEXStatics.main.showLogOnFrame(false);

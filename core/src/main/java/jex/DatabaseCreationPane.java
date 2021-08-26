@@ -31,7 +31,7 @@ public class DatabaseCreationPane extends JPanel implements ActionListener {
 	private Repository rep;
 	private JEXDatabaseChooser parent;
 	private JButton doItButton;
-	
+	private JButton cancelButton;
 	public DatabaseCreationPane(JEXDatabaseChooser parent, Repository rep)
 	{
 		this.rep = rep;
@@ -47,9 +47,10 @@ public class DatabaseCreationPane extends JPanel implements ActionListener {
 	private void initialize()
 	{
 		// Make the button
-		doItButton = new JButton("YES");
+		doItButton = new JButton("Done");
 		doItButton.addActionListener(this);
-		
+		cancelButton = new JButton("Cancel");
+		cancelButton.addActionListener(this);
 		// Make the form layout
 		ColumnSpec column1 = new ColumnSpec(ColumnSpec.FILL, Sizes.dluX(70), FormSpec.NO_GROW);
 		ColumnSpec column2 = new ColumnSpec(ColumnSpec.FILL, Sizes.dluX(100), FormSpec.DEFAULT_GROW);
@@ -62,7 +63,8 @@ public class DatabaseCreationPane extends JPanel implements ActionListener {
 		RowSpec row4 = new RowSpec(RowSpec.CENTER, Sizes.dluX(14), FormSpec.NO_GROW);
 		RowSpec row5 = new RowSpec(RowSpec.CENTER, Sizes.dluX(14), FormSpec.NO_GROW);
 		RowSpec row6 = new RowSpec(RowSpec.CENTER, Sizes.dluX(14), FormSpec.NO_GROW);
-		RowSpec[] rspecs = new RowSpec[] { row1, row2, row3, row4, row5, row6 };
+		RowSpec row7 = new RowSpec(RowSpec.CENTER, Sizes.dluX(14), FormSpec.NO_GROW);
+		RowSpec[] rspecs = new RowSpec[] { row1, row2, row3, row4, row5, row6, row7 };
 		
 		FormLayout layout = new FormLayout(cspecs, rspecs);
 		
@@ -86,6 +88,7 @@ public class DatabaseCreationPane extends JPanel implements ActionListener {
 		this.add(passField, cc.xywh(2, 3, 2, 1));
 		
 		this.add(doItButton, cc.xy(2, 5));
+		this.add(cancelButton,cc.xy(2,6));
 	}
 	
 	// ----------------------------------------------------
@@ -103,6 +106,12 @@ public class DatabaseCreationPane extends JPanel implements ActionListener {
 			boolean done = JEXStatics.jexManager.createNewDatabase(JEXDB.LOCAL_DATABASE, rep, name, info, pass);
 			Logs.log("Database creation returned " + done, 1, this);
 			
+			// Reset the datrabase chooser
+			parent.setAlternatePanel(null);
+		}
+		if(e.getSource() == cancelButton)
+		{
+			Logs.log("Database creation canceled", 1, this);
 			// Reset the datrabase chooser
 			parent.setAlternatePanel(null);
 		}

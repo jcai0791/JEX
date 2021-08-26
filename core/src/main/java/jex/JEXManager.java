@@ -1,6 +1,7 @@
 package jex;
 
 import java.io.File;
+import java.io.FileFilter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -12,6 +13,8 @@ import java.util.TreeSet;
 import java.util.Vector;
 
 import javax.swing.JOptionPane;
+
+import org.apache.commons.io.FileUtils;
 
 import Database.DBObjects.JEXData;
 import Database.DBObjects.JEXDataSingle;
@@ -49,128 +52,128 @@ import tables.DimTable;
 import tables.DimensionMap;
 
 public class JEXManager {
-	
+
 	public static String ALL_DATABASE = "all";
 	public static String FILTERED_DATABASE = "filtered";
 	public static String ARRAY_0D = "0D";
 	public static String ARRAY_1D = "1D";
 	public static String ARRAY_2D = "2D";
 	public static String ARRAY_LINK = "LINK";
-	
+
 	// JEX gui level
 	public static String VIEWINGPANEL = "viewingpanel";
-	
+
 	// Session level
 	public static String INFOPANELS_EXP = "InfoPanels";
 	public static String INFOPANELS_ARR = "InfoPanels";
 	public static String USERNAME = "username";
 	public static String DATABASES = "databases";
 	public static String CLICKDATABASE = "clickeddatabase";
-	
+
 	// database level
 	public static String BOOKMARKS = "bookmarks";
 	public static String OPENDATABASE = "opendatabase";
 	public static String HIERARCHY = "hierarchy";
 	public static String SELECTEDENTRY = "selectedentry";
 	public static String DATASETS = "datasets";
-	
+
 	// viewing options
 	public static String ARRAYVIEWMODE = "arrayviewmode";
 	public static String ARRAYDATADISPLAY = "ARRAYDATADISPLAY";
-	
+
 	// browsing the database
 	public static String EXPERIMENTTREE_CHANGE = "EXPERIMENTREE_CHANGE";
 	public static String NAVIGATION = "navigation";
-	
+
 	// selected entries
 	public static String SELECTION = "selection";
-	
+
 	// Object and label lists
 	public static String SCOPE = "scope";
 	public static String SELECTEDOBJ = "selectedobject";
 	public static String SELECTEDLABEL = "selectedlabel";
 	public static String AVAILABLEOBJ = "availableobjects";
 	public static String AVAILABLELAB = "availablelabels";
-	
+
 	// change in filtering
 	public static String FILTERSET = "filterset";
-	
+
 	// Viewed entry options
 	public static String VIEWEDENTRY = "viewedEntry";
 	public static String ENTRYVALID = "entryValid";
-	
+
 	// Viewed data
 	public static String DATAVIEWED = "dataviewed";
 	public static String DATADIMTABLE = "datadimtable";
-	
+
 	// Statistics viewing
 	public static String STATSFILTERS = "statistics filters";
 	public static String STATSGROUPS = "statistics groups";
 	public static String STATSVALUEOBJ = "statistics data";
 	public static String STATSRESULTS = "statistics result";
-	
+
 	// User name info
 	private String userName = null;
 	private String currentUserFile = null;
-	
+
 	// Databases available for each repository
 	private TreeMap<Repository,JEXDBInfo[]> databases = null;
-	
+
 	// Current database
 	private JEXDB currentDatabase = null;
 	private JEXDBInfo currentDBInfo = null;
-	
+
 	// Viewing panel, e.g. the experimental browser, or the statistics panel
 	private String viewingPanel = null;
-	
+
 	// Experimental viewing mode, e.g. 1D or 2D viewing
 	private String arrayViewingMode = ARRAY_LINK;
-	
+
 	// Viewed hierarchy level
 	private String viewedExperiment = null;
 	private String viewedArray = null;
-	
+
 	// Scope and visibility of the elements
 	private HashMap<String,String> scopeSet;
-	
+
 	// Object selected for viewing
 	private TypeName selectedObject = null;
 	private tnvi objects;
-	
+
 	// Label selected for viewing
 	private TypeName selectedLabel = null;
 	private TreeMap<String,TreeMap<String,Set<JEXEntry>>> labels;
-	
+
 	// Filterset applied
 	private FilterSet filterSet = null;
 	private List<TypeName> groups = null;
-	
+
 	// Selection
 	private TreeSet<JEXEntry> selectedEntries;
-	
+
 	// Info panels
 	private TreeMap<String,InfoPanelController> infoPanelControllersExp;
 	private TreeMap<String,InfoPanelController> infoPanelControllersArr;
-	
+
 	// Array View
 	private JEXEntry viewedEntry;
 	private boolean displayDataInArray;
-	
+
 	// Data view
 	private DimensionMap viewedData;
 	private DimTable dimTable;
-	
+
 	// Statistics variables
 	private List<TypeName> statsGroups = null;
 	private FilterSet statsFilterSet = null;
 	private TypeName statsValueObject = null;
-	
+
 	public JEXManager()
 	{
 		// reset variables
 		this.reset();
 	}
-	
+
 	/**
 	 * Reset the manager variables
 	 */
@@ -191,11 +194,11 @@ public class JEXManager {
 		this.infoPanelControllersExp = null;
 		this.infoPanelControllersArr = null;
 		this.displayDataInArray = true;
-		
+
 		// Make the scope set
 		this.scopeSet = new HashMap<String,String>();
 	}
-	
+
 	// ---------------------------------------------
 	// Session managing
 	// ---------------------------------------------
@@ -205,12 +208,12 @@ public class JEXManager {
 	public void setViewingPanel(String viewingPanel)
 	{
 		this.viewingPanel = viewingPanel;
-		
+
 		// Send a signal of change of array viewing mode
 		Logs.log("Send signal of viewed panel change", 1, this);
 		SSCenter.defaultCenter().emit(this, VIEWINGPANEL, (Object[]) null);
 	}
-	
+
 	/**
 	 * Get the panel currently viewed
 	 * 
@@ -220,11 +223,11 @@ public class JEXManager {
 	{
 		return this.viewingPanel;
 	}
-	
+
 	// ---------------------------------------------
 	// Session managing
 	// ---------------------------------------------
-	
+
 	/**
 	 * Return true if user has logged on
 	 * 
@@ -238,7 +241,7 @@ public class JEXManager {
 		}
 		return true;
 	}
-	
+
 	/**
 	 * Create a new user file
 	 * 
@@ -248,37 +251,37 @@ public class JEXManager {
 	public boolean createUser(File userFile)
 	{
 		boolean result = true;
-		
+
 		// Saving the file
 		File folder = userFile.getParentFile();
 		if(!folder.exists())
 		{
 			folder.mkdirs();
 		}
-		
+
 		// Creating the file content
 		XPreferences prefs = new XPreferences();
-		
+
 		// Create the user preferences node
 		XPreferences userPrefernces = prefs.getChildNode("User Preferences");
 		userPrefernces.put("Consolidate Database", "false");
-		
+
 		// Make octave preferences
 		XPreferences octavePrefernces = userPrefernces.getChildNode("Octave");
 		octavePrefernces.put("OctavePath", "/Applications/Octave.app/Contents/Resources/bin/octave");
 		octavePrefernces.putBoolean("AutoDrawNow", true);
 		octavePrefernces.putInt("History length", 100);
-		
+
 		// Create the repository node
 		@SuppressWarnings("unused")
 		XPreferences repositoryNode = prefs.getChildNode("Repositories");
-		
+
 		// Save
 		prefs.saveToPath(userFile.getAbsolutePath());
-		
+
 		return result;
 	}
-	
+
 	/**
 	 * Set the username
 	 * 
@@ -292,24 +295,24 @@ public class JEXManager {
 		Logs.log("Triggering new database creation", 1, this);
 		this.userName = FileUtility.getFileNameWithoutExtension(userFile.getName());
 		SSCenter.defaultCenter().emit(this, USERNAME, (Object[]) null);
-		
+
 		// Get the root preferences
 		PrefsUtility.loadPrefs(userFile.getAbsolutePath());
-		
+
 		// Get the list of repositories
 		List<Repository> repositoryList = PrefsUtility.getRepositoryList();
-		
+
 		// Get the databases in the repositories
 		for (int index = 0; index < repositoryList.size(); index++)
 		{
 			Repository rep = repositoryList.get(index);
-			
+
 			// Find databases inside
 			JEXDBInfo[] dbs = JEXDBInfo.findDatabasesInRepository(rep);
-			
+
 			// Send to log
 			Logs.log("Added repository " + rep.getPath() + " with " + dbs.length + " databases", 1, this);
-			
+
 			// Add it to the hash map
 			// initialize the variable if necessary
 			if(this.databases == null)
@@ -318,11 +321,11 @@ public class JEXManager {
 			}
 			this.databases.put(rep, dbs);
 		}
-		
+
 		// Emit signal of repository hashmap change
 		Logs.log("Send signal of change of database list", 1, this);
 		SSCenter.defaultCenter().emit(this, DATABASES, (Object[]) null);
-		
+
 		// Add the user file to the recently opened list
 		java.util.prefs.Preferences prefs = java.util.prefs.Preferences.userNodeForPackage(this.getClass());
 		String fileCSV = prefs.get("Recent user files", "");
@@ -340,10 +343,10 @@ public class JEXManager {
 			fileCSV = csv.toString();
 			prefs.put("Recent user files", fileCSV);
 		}
-		
+
 		return true;
 	}
-	
+
 	/**
 	 * Set the username
 	 * 
@@ -353,10 +356,10 @@ public class JEXManager {
 	{
 		this.userName = null;
 		this.reset();
-		
+
 		return true;
 	}
-	
+
 	/**
 	 * Get the user login name
 	 * 
@@ -366,7 +369,7 @@ public class JEXManager {
 	{
 		return this.userName;
 	}
-	
+
 	/**
 	 * Order the creation of a new repository to look for databases
 	 * 
@@ -382,13 +385,13 @@ public class JEXManager {
 		{
 			this.databases = new TreeMap<Repository,JEXDBInfo[]>();
 		}
-		
+
 		// Make the new repository
 		Repository rep = new Repository(path, usr, pswd);
-		
+
 		// Find databases inside
 		JEXDBInfo[] dbs = JEXDBInfo.findDatabasesInRepository(rep);
-		
+
 		// Add it to the hash map
 		boolean done = PrefsUtility.addRepository(rep);
 		if(!done)
@@ -397,14 +400,14 @@ public class JEXManager {
 			return false;
 		}
 		this.databases.put(rep, dbs);
-		
+
 		// Send a signal of change of repository list
 		Logs.log("Send signal of change of database list", 1, this);
 		SSCenter.defaultCenter().emit(this, DATABASES, (Object[]) null);
-		
+
 		return true;
 	}
-	
+
 	/**
 	 * Remove a repository from the list
 	 * 
@@ -419,24 +422,24 @@ public class JEXManager {
 		{
 			return false;
 		}
-		
+
 		Logs.log("Repoistory will be removed", 0, this);
 		boolean done = PrefsUtility.removeRepository(rep);
-		
+
 		if(!done)
 		{
 			Logs.log("Repository removal failed", 1, this);
 			return false;
 		}
 		this.databases.remove(rep);
-		
+
 		// Send a signal of change of repository list
 		Logs.log("Send signal of change of database list", 1, this);
 		SSCenter.defaultCenter().emit(this, DATABASES, (Object[]) null);
-		
+
 		return true;
 	}
-	
+
 	/**
 	 * Edit a repository from the list
 	 * 
@@ -454,15 +457,15 @@ public class JEXManager {
 		{
 			this.databases = new TreeMap<Repository,JEXDBInfo[]>();
 		}
-		
+
 		// Make the new repository
 		rep.setPassword(pswd);
 		rep.setPath(path);
 		rep.setUserName(usr);
-		
+
 		// Find databases inside
 		JEXDBInfo[] dbs = JEXDBInfo.findDatabasesInRepository(rep);
-		
+
 		// Add it to the hash map
 		boolean done = PrefsUtility.updateRepository(rep);
 		if(!done)
@@ -471,14 +474,14 @@ public class JEXManager {
 			return false;
 		}
 		this.databases.put(rep, dbs);
-		
+
 		// Send a signal of change of repository list
 		Logs.log("Send signal of change of database list", 1, this);
 		SSCenter.defaultCenter().emit(this, DATABASES, (Object[]) null);
-		
+
 		return true;
 	}
-	
+
 	/**
 	 * Return the list of user files that have been opened recently
 	 * 
@@ -492,25 +495,25 @@ public class JEXManager {
 		String[] result = csv.toStringArray();
 		return result;
 	}
-	
+
 	/**
 	 * Get current user
 	 */
 	public String getCurrentUserFile() {
 		return this.currentUserFile;
 	}
-	
+
 	// ---------------------------------------------
 	// Database managing
 	// ---------------------------------------------
-	
+
 	/**
 	 * Delete a Database
 	 */
 	public boolean deleteDatabase(JEXDBInfo info, Repository rep)
 	{
 		Logs.log("Deleting Database", 1, this);
-		
+
 		if(info == null)
 		{
 			return false;
@@ -520,7 +523,7 @@ public class JEXManager {
 		} catch (IOException e) {
 			Logs.log("Could not delete database",this);
 		}
-		
+
 		JEXDBInfo[] dbs = this.databases.get(rep);
 		JEXDBInfo[] newDBs = new JEXDBInfo[dbs.length - 1];
 		int pointer = 0;
@@ -532,12 +535,12 @@ public class JEXManager {
 			}
 		}
 		this.databases.put(rep, newDBs);
-		
-		
+
+
 		// Send a signal of change of repository list
 		Logs.log("Send signal of change of database list", 1, this);
 		SSCenter.defaultCenter().emit(this, DATABASES, (Object[]) null);
-		
+
 		return true;
 	}
 	/**
@@ -546,10 +549,10 @@ public class JEXManager {
 	public boolean createNewDatabase(String type, Repository rep, String name, String info, String password)
 	{
 		Logs.log("Creating Database", 1, this);
-		
+
 		// Create a new database in the right repository
 		JEXDBInfo db = JEXWriter.createDBInfo(rep, name, info, password);
-		
+
 		// Add it to the database map
 		if(db == null)
 		{
@@ -572,14 +575,73 @@ public class JEXManager {
 			newDBs[dbs.length] = db;
 			this.databases.put(rep, newDBs);
 		}
-		
+
 		// Send a signal of change of repository list
 		Logs.log("Send signal of change of database list", 1, this);
 		SSCenter.defaultCenter().emit(this, DATABASES, (Object[]) null);
-		
+
 		return true;
 	}
-	
+
+	/**
+	 * Clone a Database
+	 */
+	public boolean cloneDatabase(JEXDBInfo DBInfo, String type, Repository rep, String name, String info, String password)
+	{
+		Logs.log("Creating Database", 1, this);
+
+		// Create a new database in the right repository
+		JEXDBInfo db = JEXWriter.createDBInfo(rep, name, info, password);
+
+		// Add it to the database map
+		if(db == null)
+		{
+			return false;
+		}
+		JEXDBInfo[] dbs = this.databases.get(rep);
+		if(dbs == null)
+		{
+			dbs = new JEXDBInfo[1];
+			dbs[0] = db;
+			this.databases.put(rep, dbs);
+		}
+		else
+		{
+			JEXDBInfo[] newDBs = new JEXDBInfo[dbs.length + 1];
+			for (int i = 0; i < dbs.length; i++)
+			{
+				newDBs[i] = dbs[i];
+			}
+			newDBs[dbs.length] = db;
+			this.databases.put(rep, newDBs);
+		}
+
+
+		File dst = new File(db.getDirectory());
+		File src = new File(DBInfo.getDirectory());
+		FileFilter fileFilter = new FileFilter() 
+		{
+			public boolean accept(File file) {
+				if (file.getName().endsWith(".jex")) return false;
+				return true;
+//				else if(file.isDirectory()) return true;
+//				else if(file.getName().endsWith(".jxd")) return true;
+//				return false;
+			}
+		};
+		try {
+			FileUtils.copyDirectory(src, dst,fileFilter, false);
+		} catch (IOException e) {
+			Logs.log("Error copying database", this);
+			e.printStackTrace();
+		}
+
+		// Send a signal of change of repository list
+		Logs.log("Send signal of change of database list", 1, this);
+		SSCenter.defaultCenter().emit(this, DATABASES, (Object[]) null);
+		return true;
+	}
+
 	/**
 	 * Return a hashmap of available databases for all defined repositories
 	 */
@@ -587,7 +649,7 @@ public class JEXManager {
 	{
 		return this.databases;
 	}
-	
+
 	/**
 	 * Set the list of avaialable databases... this causes a signal to be emited on the DATABSES channel
 	 * 
@@ -596,12 +658,12 @@ public class JEXManager {
 	public void setAvailableDatabases(TreeMap<Repository,JEXDBInfo[]> databases)
 	{
 		this.databases = databases;
-		
+
 		// Emit signal of database list change
 		Logs.log("Send signal of change of database list", 1, this);
 		SSCenter.defaultCenter().emit(this, DATABASES, (Object[]) null);
 	}
-	
+
 	/**
 	 * Returns the currently browsed database
 	 * 
@@ -611,7 +673,7 @@ public class JEXManager {
 	{
 		return this.currentDatabase;
 	}
-	
+
 	/**
 	 * Return true if the current database contains unsaved modifications
 	 * 
@@ -625,25 +687,25 @@ public class JEXManager {
 		}
 		return this.getCurrentDatabase().containsUnsavedData();
 	}
-	
+
 	/**
 	 * Save the current database
 	 */
 	public void saveCurrentDatabase()
 	{
-		
+
 		if(this.getCurrentDatabase() == null || this.getDatabaseInfo() == null)
 		{
 			JEXStatics.statusBar.setStatusText("No database loaded");
 			return;
 		}
-		
+
 		// Save the database
 		boolean success = JEXDBIO.saveDB(this.getCurrentDatabase());
-		
+
 		// Save the db info
 		JEXWriter.saveBDInfo(this.getDatabaseInfo());
-		
+
 		// Set the flag
 		if(success)
 		{
@@ -655,7 +717,7 @@ public class JEXManager {
 			JEXStatics.statusBar.setStatusText("Error during saving of database. Unsaved changes exist.");
 		}
 	}
-	
+
 	/**
 	 * Returns the database info of the current database
 	 * 
@@ -665,7 +727,7 @@ public class JEXManager {
 	{
 		return this.currentDBInfo;
 	}
-	
+
 	/**
 	 * Set the database info and open/load/refresh the database associated to it
 	 * 
@@ -675,14 +737,14 @@ public class JEXManager {
 	{
 		// Reset the Manager variables
 		this.reset();
-		
+
 		// Set the database info
 		this.currentDBInfo = currentDBInfo;
 		DirectoryManager.setHostDirectory(currentDBInfo.getDirectory());
-		
+
 		// Change the status bar
 		JEXStatics.statusBar.setStatusText("Opening Database");
-		
+
 		// Load the database
 		JEXDB temp = JEXDBIO.load(JEXWriter.getDatabaseFolder() + File.separator + JEXDBIO.LOCAL_DATABASE_FILENAME);
 		if(temp == null)
@@ -691,60 +753,60 @@ public class JEXManager {
 			return;
 		}
 		this.currentDatabase = temp;
-		
+
 		this.currentDatabase.setFilterSet(null);
 		this.currentDatabase.setGroupingSet(null);
-		
+
 		// Load the label color code
 		currentDBInfo.fillLabelColorCode(); // sets colors in JEXLabelColorCode
 		JEXStatics.labelManager.setLabels(currentDBInfo.getLabels());
-		
+
 		// switch viewed panel
 		// JEXStatics.main.displayViewPane();
-		
+
 		// set the selected entries
 		this.setSelectedEntries(null);
-		
+
 		// Set the selected labels and objects to null
 		this.setSelectedLabel(null);
 		this.setSelectedObject(null);
-		
+
 		// Set the label list
 		TreeMap<String,TreeMap<String,Set<JEXEntry>>> thelabels = this.getTNVI().get(JEXData.LABEL);
 		this.setLabels(thelabels);
-		
+
 		// Set the objects list
 		tnvi theobjects = JEXStatics.jexManager.getTNVI();
 		this.setObjects(theobjects);
-		
+
 		// Emit signal of viewing mode
 		Logs.log("Send signal of experiment viewing mode change", 1, this);
 		this.setArrayViewingMode(ARRAY_LINK);
-		
+
 		// Emit signal of experiment tree change
 		Logs.log("Send signal of experiment tree change", 1, this);
 		SSCenter.defaultCenter().emit(this, EXPERIMENTTREE_CHANGE, (Object[]) null);
-		
+
 		// Send a signal of change of browsed database
 		Logs.log("Send signal of change of database", 1, this);
 		SSCenter.defaultCenter().emit(this, OPENDATABASE, (Object[]) null);
-		
+
 		// // Set the database / repository info panel
 		// DatabaseInfoPanel infoPanel = new DatabaseInfoPanel(currentDBInfo);
 		// setInfoPanel("Database", infoPanel);
-		
+
 		// Send a signal of change of browsed database
 		Logs.log("Send signal of change of database content", 1, this);
 		SSCenter.defaultCenter().emit(this, DATASETS, (Object[]) null);
-		
+
 		// Change the status bar
 		JEXStatics.statusBar.setStatusText("Opened Database");
 	}
-	
+
 	// ---------------------------------------------
 	// Database editing
 	// ---------------------------------------------
-	
+
 	/**
 	 * Check for conflicts of names and create an array of entries in the current database using methods of JEXDB
 	 * 
@@ -758,26 +820,26 @@ public class JEXManager {
 	public boolean createEntryArray(String expName, String date, String info, int w, int h)
 	{
 		String author = this.userName;
-		
+
 		// Check if entires already exist in the same experiment and tray
 		TreeMap<String,Experiment> experiments = this.getCurrentDatabase().getExperimentalTable();
 		Experiment arraysOfSameExperimentName = experiments.get(expName);
-		
+
 		if(arraysOfSameExperimentName != null)
 		{			
 			JEXDialog.messageDialog("Warning: A dataset by that name already exists. No additional dataset created.");
 			return false;
 		}
-		
+
 		JEXStatics.jexDBManager.addEntries(expName, w, h, date, author, info);
 		JEXStatics.statusBar.setStatusText("Created db entries");
 		return true;
 	}
-	
+
 	// ---------------------------------------------
 	// Database selection
 	// ---------------------------------------------
-	
+
 	/**
 	 * Return the selected entries
 	 * 
@@ -787,7 +849,7 @@ public class JEXManager {
 	{
 		return this.selectedEntries;
 	}
-	
+
 	/**
 	 * Add entry to selection list
 	 * 
@@ -800,12 +862,12 @@ public class JEXManager {
 			this.selectedEntries = new TreeSet<JEXEntry>();
 		}
 		this.selectedEntries.add(entry);
-		
+
 		// Send a signal of change of selected object
 		Logs.log("Send signal of change of selection", 1, this);
 		SSCenter.defaultCenter().emit(this, SELECTION, (Object[]) null);
 	}
-	
+
 	/**
 	 * Add a list of entries to the selection
 	 * 
@@ -821,12 +883,12 @@ public class JEXManager {
 		{
 			this.selectedEntries.add(entry);
 		}
-		
+
 		// Send a signal of change of selected object
 		Logs.log("Send signal of change of selection", 1, this);
 		SSCenter.defaultCenter().emit(this, SELECTION, (Object[]) null);
 	}
-	
+
 	/**
 	 * Set the selection list of entries
 	 * 
@@ -842,12 +904,12 @@ public class JEXManager {
 		{
 			this.selectedEntries = entries;
 		}
-		
+
 		// Send a signal of change of selected object
 		Logs.log("Send signal of change of selection", 1, this);
 		SSCenter.defaultCenter().emit(this, SELECTION, (Object[]) null);
 	}
-	
+
 	/**
 	 * Remove the entry ENTRY from selection list
 	 * 
@@ -860,12 +922,12 @@ public class JEXManager {
 			this.selectedEntries = new TreeSet<JEXEntry>();
 		}
 		this.selectedEntries.remove(entry);
-		
+
 		// Send a signal of change of selected object
 		Logs.log("Send signal of change of selection", 1, this);
 		SSCenter.defaultCenter().emit(this, SELECTION, (Object[]) null);
 	}
-	
+
 	/**
 	 * Remove the entries ENTRIES from selection list
 	 * 
@@ -881,12 +943,12 @@ public class JEXManager {
 		{
 			this.selectedEntries.remove(entry);
 		}
-		
+
 		// Send a signal of change of selected object
 		Logs.log("Send signal of change of selection", 1, this);
 		SSCenter.defaultCenter().emit(this, SELECTION, (Object[]) null);
 	}
-	
+
 	/**
 	 * Return true if one of the entries is contained in the set of selected entries
 	 * 
@@ -899,7 +961,7 @@ public class JEXManager {
 		{
 			return false;
 		}
-		
+
 		boolean result = false;
 		for (JEXEntry entry : entries)
 		{
@@ -907,7 +969,7 @@ public class JEXManager {
 		}
 		return result;
 	}
-	
+
 	/**
 	 * Return true if all of the entries are contained in the set of selected entries
 	 * 
@@ -920,7 +982,7 @@ public class JEXManager {
 		{
 			return false;
 		}
-		
+
 		boolean result = true;
 		for (JEXEntry entry : entries)
 		{
@@ -928,7 +990,7 @@ public class JEXManager {
 		}
 		return result;
 	}
-	
+
 	/**
 	 * Return true if the entry ENTRY is contained in the set of selected entries
 	 * 
@@ -943,20 +1005,20 @@ public class JEXManager {
 		}
 		return this.selectedEntries.contains(entry);
 	}
-	
+
 	// ---------------------------------------------
 	// Database viewing
 	// ---------------------------------------------
-	
+
 	/**
 	 * Open a bookmarked link
 	 */
 	public void openLink(Bookmark bookmark)
 	{
 		Logs.log("Going to link", 1, this);
-		
+
 	}
-	
+
 	/**
 	 * Set the array viewing mode
 	 * 
@@ -965,7 +1027,7 @@ public class JEXManager {
 	public void setArrayViewingMode(String arrayViewingMode)
 	{
 		this.arrayViewingMode = arrayViewingMode;
-		
+
 		String exp = this.getViewedExperiment();
 		String arr = this.getArrayViewed();
 		if(exp == null && arr == null)
@@ -981,7 +1043,7 @@ public class JEXManager {
 			else if(arrayViewingMode.equals(ARRAY_0D))
 			{
 				this.setGroupingSet(null);
-				
+
 				// if no entry is viewed selected the first one
 				JEXEntry entry = this.getViewedEntry();
 				if(entry == null)
@@ -1010,7 +1072,7 @@ public class JEXManager {
 			else if(arrayViewingMode.equals(ARRAY_0D))
 			{
 				this.setGroupingSet(null);
-				
+
 				// if no entry is viewed selecte the first one
 				JEXEntry entry = this.getViewedEntry();
 				if(entry == null)
@@ -1042,7 +1104,7 @@ public class JEXManager {
 			else if(arrayViewingMode.equals(ARRAY_0D))
 			{
 				this.setGroupingSet(null);
-				
+
 				// if no entry is viewed selected the first one
 				JEXEntry entry = this.getViewedEntry();
 				if(entry == null)
@@ -1057,12 +1119,12 @@ public class JEXManager {
 				return;
 			}
 		}
-		
+
 		// Send a signal of change of array viewing mode
 		Logs.log("Send signal of arrayed view mode change", 1, this);
 		SSCenter.defaultCenter().emit(this, ARRAYVIEWMODE, (Object[]) null);
 	}
-	
+
 	/**
 	 * Return the array viewing mode
 	 * 
@@ -1072,7 +1134,7 @@ public class JEXManager {
 	{
 		return this.arrayViewingMode;
 	}
-	
+
 	/**
 	 * Return the object to be displayed
 	 * 
@@ -1086,7 +1148,7 @@ public class JEXManager {
 		}
 		return this.getCurrentDatabase().getGroupedEntries();
 	}
-	
+
 	/**
 	 * Return the TNVI of the database
 	 * 
@@ -1100,7 +1162,7 @@ public class JEXManager {
 		}
 		return this.getCurrentDatabase().getTNVI();
 	}
-	
+
 	/**
 	 * Return the filtered TNVI of the database
 	 * 
@@ -1116,7 +1178,7 @@ public class JEXManager {
 		return result;
 		// return this.getCurrentDatabase().getFilteredTNVI();
 	}
-	
+
 	/**
 	 * Return a TNVI dictionary for an entry list
 	 * 
@@ -1127,7 +1189,7 @@ public class JEXManager {
 	{
 		return this.getCurrentDatabase().getTNVIforEntryList(entries);
 	}
-	
+
 	/**
 	 * Return the labels to be displayed
 	 * 
@@ -1141,7 +1203,7 @@ public class JEXManager {
 		//
 		return this.labels;
 	}
-	
+
 	/**
 	 * Set the label map of available labels to be displayed
 	 * 
@@ -1150,12 +1212,12 @@ public class JEXManager {
 	public void setLabels(TreeMap<String,TreeMap<String,Set<JEXEntry>>> labels)
 	{
 		this.labels = labels;
-		
+
 		// Send a signal of change of selected object
 		Logs.log("Send signal of change of labels available", 1, this);
 		SSCenter.defaultCenter().emit(this, AVAILABLELAB, (Object[]) null);
 	}
-	
+
 	/**
 	 * Return the labels to be displayed
 	 * 
@@ -1165,7 +1227,7 @@ public class JEXManager {
 	{
 		return this.objects;
 	}
-	
+
 	/**
 	 * Set the object map of available objects to be displayed
 	 * 
@@ -1174,12 +1236,12 @@ public class JEXManager {
 	public void setObjects(tnvi objects)
 	{
 		this.objects = objects;
-		
+
 		// Send a signal of change of selected object
 		Logs.log("Send signal of change of object available", 1, this);
 		SSCenter.defaultCenter().emit(this, AVAILABLEOBJ, (Object[]) null);
 	}
-	
+
 	public void updateLabelsAndObjects()
 	{
 		if(this.viewedExperiment == null)
@@ -1195,7 +1257,7 @@ public class JEXManager {
 			}
 			this.getCurrentDatabase().setFilteredDictionaries(exp.tnvi(), exp.getEntries());
 		}
-		
+
 		// Change the available objects and labels if scope is not the whole
 		// database
 		String labScope = this.getScope(LabelsPanel.class.toString());
@@ -1217,7 +1279,7 @@ public class JEXManager {
 			this.setObjects(this.getTNVI());
 		}
 	}
-	
+
 	/**
 	 * Return the data object in entry ENTRY of typename TN
 	 * 
@@ -1230,7 +1292,7 @@ public class JEXManager {
 		JEXData result = this.getCurrentDatabase().getUpdateFlavoredDataOfTypeNameInEntry(tn, entry);
 		return result;
 	}
-	
+
 	/**
 	 * Return the data object in entry ENTRY of typename TN
 	 * 
@@ -1243,7 +1305,7 @@ public class JEXManager {
 		JEXData result = this.getCurrentDatabase().getDataOfTypeNameInEntry(tn, entry);
 		return result;
 	}
-	
+
 	/**
 	 * Return the data object in entry ENTRY of typename TN
 	 * 
@@ -1256,13 +1318,13 @@ public class JEXManager {
 		Vector<JEXData> result = this.getCurrentDatabase().getDatasOfTypeWithNameContainingInEntry(tn, entry);
 		return result;
 	}
-	
+
 	public Vector<JEXData> getUpdateFlavoredDatasInEntry(JEXEntry entry)
 	{
 		Vector<JEXData> result = this.getCurrentDatabase().getUpdateFlavoredDatasInEntry(entry);
 		return result;
 	}
-	
+
 	/**
 	 * Return a data object of typename TN in the first encountered entry with such and object
 	 * 
@@ -1283,7 +1345,7 @@ public class JEXManager {
 		}
 		return ret;
 	}
-	
+
 	/**
 	 * Appends " i" to the name of the object where i is indexed to find the next available name. The value of i starts at 1 and increases. The name will not exist in any of the supplied entries.
 	 * 
@@ -1307,7 +1369,7 @@ public class JEXManager {
 		}
 		return newTN;
 	}
-	
+
 	private boolean entryListContains(List<JEXEntry> entries, TypeName tn)
 	{
 		for (int i = 0; i < entries.size(); i++)
@@ -1319,11 +1381,11 @@ public class JEXManager {
 		}
 		return false;
 	}
-	
+
 	// ---------------------------------------------
 	// Selected Object and Labels
 	// ---------------------------------------------
-	
+
 	/**
 	 * Set the selected object
 	 * 
@@ -1332,11 +1394,11 @@ public class JEXManager {
 	public void setSelectedObject(TypeName object)
 	{
 		this.selectedObject = object;
-		
+
 		// Send a signal of change of selected object
 		Logs.log("Send signal of change of selected object", 1, this);
 		SSCenter.defaultCenter().emit(this, SELECTEDOBJ, (Object[]) null);
-		
+
 		// // Set the database / repository info panel
 		// if (object == null) setInfoPanel("SelectedObject", null);
 		// else {
@@ -1344,14 +1406,14 @@ public class JEXManager {
 		// SelectedObjectInfoPanel(object);
 		// setInfoPanel("SelectedObject", infoPanel);
 		// }
-		
+
 		// Update viewed data if necessary
 		this.updateDimensionTable();
-		
+
 		// Set this object for statistics too
 		this.setSelectedStatisticsObject(object);
 	}
-	
+
 	/**
 	 * Return the typename of the selectedobject
 	 * 
@@ -1361,7 +1423,7 @@ public class JEXManager {
 	{
 		return this.selectedObject;
 	}
-	
+
 	/**
 	 * Set the selected label
 	 * 
@@ -1370,11 +1432,11 @@ public class JEXManager {
 	public void setSelectedLabel(TypeName object)
 	{
 		this.selectedLabel = object;
-		
+
 		// Send a signal of change of selected object
 		Logs.log("Send signal of change of selected label", 1, this);
 		SSCenter.defaultCenter().emit(this, SELECTEDLABEL, (Object[]) null);
-		
+
 		// // Set the database / repository info panel
 		// if (object == null) setInfoPanel("SelectedLabel", null);
 		// else {
@@ -1383,7 +1445,7 @@ public class JEXManager {
 		// setInfoPanel("SelectedLabel", infoPanel);
 		// }
 	}
-	
+
 	/**
 	 * Return the typename of the selectedLabel
 	 * 
@@ -1393,7 +1455,7 @@ public class JEXManager {
 	{
 		return this.selectedLabel;
 	}
-	
+
 	/**
 	 * Return a map of all labels and label values available for the entry set ENTRIES
 	 * 
@@ -1404,7 +1466,7 @@ public class JEXManager {
 	{
 		// Create the list of labels
 		TreeMap<String,TreeSet<String>> result = new TreeMap<String,TreeSet<String>>();
-		
+
 		// Loop through the entries and look for entries continaing a label
 		// named SELECTEDNAME
 		for (JEXEntry entry : entries)
@@ -1415,30 +1477,30 @@ public class JEXManager {
 			{
 				continue;
 			}
-			
+
 			// Get the NV
 			TreeMap<String,JEXData> nv = tnv.get(JEXData.LABEL);
 			if(nv == null)
 			{
 				continue;
 			}
-			
+
 			// Loop through the label names and values
 			for (String labelName : nv.keySet())
 			{
 				// Get the value for labelname
 				JEXData valueData = nv.get(labelName);
-				
+
 				// Get the current list for label name LABELNAME
 				TreeSet<String> values = result.get(labelName);
-				
+
 				// if it's null add a new list
 				if(values == null)
 				{
 					values = new TreeSet<String>();
 					result.put(labelName, values);
 				}
-				
+
 				// Add the value to the set
 				if(!values.contains(valueData.getDictionaryValue()))
 				{
@@ -1446,11 +1508,11 @@ public class JEXManager {
 				}
 			}
 		}
-		
+
 		// return the list
 		return result;
 	}
-	
+
 	/**
 	 * Return a map of all labels and label values available for the entry set ENTRIES
 	 * 
@@ -1461,39 +1523,39 @@ public class JEXManager {
 	{
 		// Create the list of labels
 		TreeMap<String,String> result = new TreeMap<String,String>();
-		
+
 		// get the tnv
 		TreeMap<Type,TreeMap<String,JEXData>> tnv = entry.getDataList();
 		if(tnv == null)
 		{
 			return result;
 		}
-		
+
 		// Get the NV
 		TreeMap<String,JEXData> nv = tnv.get(JEXData.LABEL);
 		if(nv == null)
 		{
 			return result;
 		}
-		
+
 		// Loop through the label names and values
 		for (String labelName : nv.keySet())
 		{
 			// Get the value for labelname
 			JEXData valueData = nv.get(labelName);
-			
+
 			// Add it to result list
 			result.put(labelName, valueData.getDictionaryValue());
 		}
-		
+
 		// return the list
 		return result;
 	}
-	
+
 	// ---------------------------------------------
 	// Database entry Grouping
 	// ---------------------------------------------
-	
+
 	/**
 	 * Return the set of Typenames listed to group the datasets
 	 */
@@ -1501,7 +1563,7 @@ public class JEXManager {
 	{
 		return this.groups;
 	}
-	
+
 	/**
 	 * Set the grouping list
 	 */
@@ -1509,12 +1571,12 @@ public class JEXManager {
 	{
 		this.groups = tns;
 		this.getCurrentDatabase().setGroupingSet(tns);
-		
+
 		// Send a signal of change of browsed database
 		Logs.log("Send signal of change of database content", 1, this);
 		SSCenter.defaultCenter().emit(this, DATASETS, (Object[]) null);
 	}
-	
+
 	/**
 	 * Add a group to the grouping list
 	 */
@@ -1526,16 +1588,16 @@ public class JEXManager {
 		}
 		this.groups.add(tn);
 		this.getCurrentDatabase().setGroupingSet(this.groups);
-		
+
 		// Send a signal of change of browsed database
 		Logs.log("Send signal of change of database content", 1, this);
 		SSCenter.defaultCenter().emit(this, DATASETS, (Object[]) null);
 	}
-	
+
 	// ---------------------------------------------
 	// Database filtering
 	// ---------------------------------------------
-	
+
 	/**
 	 * Set the filterset of the databse
 	 * 
@@ -1544,7 +1606,7 @@ public class JEXManager {
 	public void setFilterSet(FilterSet filterset)
 	{
 		this.filterSet = filterset;
-		
+
 		this.getCurrentDatabase().setFilterSet(this.filterSet);
 		// Change the available objects and labels if scope is not the whole
 		// database
@@ -1566,10 +1628,10 @@ public class JEXManager {
 		{
 			this.setObjects(this.getTNVI());
 		}
-		
+
 		this.getCurrentDatabase().emitAvailableObjectsSignal();
 	}
-	
+
 	/**
 	 * Add a filter to the filterset... allows rapid rebuilding of the dictionaries rather than resetting the whole filterset Return true is successful
 	 * 
@@ -1584,14 +1646,14 @@ public class JEXManager {
 		}
 		this.filterSet.add(filter);
 		this.getCurrentDatabase().addFilter(filter);
-		
+
 		// Emit signal of repository hashmap change
 		Logs.log("Send signal of change of database dictionary", 1, this);
 		SSCenter.defaultCenter().emit(this, AVAILABLEOBJ, (Object[]) null);
-		
+
 		return true;
 	}
-	
+
 	/**
 	 * Set the scope (visibility) of the element of type TYPE to the value SCOPE
 	 * 
@@ -1603,17 +1665,17 @@ public class JEXManager {
 	public void setScope(String type, String scope)
 	{
 		String oldScope = this.scopeSet.get(type);
-		
+
 		// Test if the scope really has changed
 		if(oldScope == null || !oldScope.equals(scope))
 		{
 			// Set the new scope
 			this.scopeSet.put(type, scope);
-			
+
 			// Emit signal of repository hashmap change
 			Logs.log("Send signal of change of scope", 1, this);
 			SSCenter.defaultCenter().emit(this, SCOPE, (Object[]) null);
-			
+
 			// Rebuild what needs to be rebuild
 			if(type.equals(LabelsPanel.class.toString()))
 			{
@@ -1644,7 +1706,7 @@ public class JEXManager {
 		}
 		return;
 	}
-	
+
 	/**
 	 * Returns the scope of the element of type TYPE
 	 * 
@@ -1659,11 +1721,11 @@ public class JEXManager {
 		}
 		return scope;
 	}
-	
+
 	// ---------------------------------------------
 	// Experimental tree
 	// ---------------------------------------------
-	
+
 	/**
 	 * Set the experiment filter
 	 * 
@@ -1672,14 +1734,14 @@ public class JEXManager {
 	public void setViewedExperiment(String viewedExperiment)
 	{
 		this.viewedExperiment = viewedExperiment;
-		
+
 		this.updateLabelsAndObjects();
-		
+
 		// Emit signal of viewed experiment change
 		Logs.log("Send signal of viewed experiment change", 1, this);
 		SSCenter.defaultCenter().emit(this, NAVIGATION, (Object[]) null);
 	}
-	
+
 	/**
 	 * Return the current experiment being viewed
 	 * 
@@ -1689,7 +1751,7 @@ public class JEXManager {
 	{
 		return this.viewedExperiment;
 	}
-	
+
 	/**
 	 * Return the current arrayed viewed
 	 * 
@@ -1699,7 +1761,7 @@ public class JEXManager {
 	{
 		return this.viewedArray;
 	}
-	
+
 	/**
 	 * return the experiment tree
 	 * 
@@ -1714,7 +1776,7 @@ public class JEXManager {
 		TreeMap<String,Experiment> experiments = this.getCurrentDatabase().getExperimentalTable();
 		return experiments;
 	}
-	
+
 	/**
 	 * Return the current viewed hierarchy level
 	 * 
@@ -1724,7 +1786,7 @@ public class JEXManager {
 	{
 		// Get the viewed experiment
 		String expViewed = this.getViewedExperiment();
-		
+
 		// if the experiment viewed is null return the whole database
 		if(expViewed == null)
 		{
@@ -1735,7 +1797,7 @@ public class JEXManager {
 			// Get the experiment object
 			TreeMap<String,Experiment> expTree = this.getExperimentTree();
 			Experiment exp = expTree.get(expViewed);
-			
+
 			// If it is null return the whole database
 			if(exp == null)
 			{
@@ -1747,25 +1809,25 @@ public class JEXManager {
 			}
 		}
 	}
-	
+
 	// ---------------------------------------------
 	// Bookmarks managing
 	// ---------------------------------------------
-	
+
 	/**
 	 * Make a bookmark saving the current display / browsing settings
 	 */
 	public Bookmark makeBookMark(String bkName, String bkInfo)
 	{
 		Bookmark result = new Bookmark();
-		
+
 		return result;
 	}
-	
+
 	// ---------------------------------------------
 	// InfoPanels
 	// ---------------------------------------------
-	
+
 	// Get the list of infopanel controllers
 	public TreeMap<String,InfoPanelController> getInfoPanelControllersExp()
 	{
@@ -1775,7 +1837,7 @@ public class JEXManager {
 		}
 		return this.infoPanelControllersExp;
 	}
-	
+
 	// Set an infopanel controller with a key KEY
 	public void setInfoPanelControllerExp(String key, InfoPanelController controller)
 	{
@@ -1786,7 +1848,7 @@ public class JEXManager {
 		this.infoPanelControllersExp.put(key, controller);
 		SSCenter.defaultCenter().emit(this, INFOPANELS_EXP, (Object[]) null);
 	}
-	
+
 	// Get the list of infopanel controllers
 	public TreeMap<String,InfoPanelController> getInfoPanelControllersArr()
 	{
@@ -1796,7 +1858,7 @@ public class JEXManager {
 		}
 		return this.infoPanelControllersArr;
 	}
-	
+
 	// Set an infopanel controller with a key KEY
 	public void setInfoPanelControllerArr(String key, InfoPanelController controller)
 	{
@@ -1807,11 +1869,11 @@ public class JEXManager {
 		this.infoPanelControllersArr.put(key, controller);
 		SSCenter.defaultCenter().emit(this, INFOPANELS_ARR, (Object[]) null);
 	}
-	
+
 	// ---------------------------------------------
 	// Array view template
 	// ---------------------------------------------
-	
+
 	/**
 	 * Set flag to true to display data in the array
 	 */
@@ -1820,7 +1882,7 @@ public class JEXManager {
 		this.displayDataInArray = displayDataInArray;
 		SSCenter.defaultCenter().emit(this, ARRAYDATADISPLAY, (Object[]) null);
 	}
-	
+
 	/**
 	 * Returns the flag controlling whether data should be viewed in the arrays
 	 * 
@@ -1830,7 +1892,7 @@ public class JEXManager {
 	{
 		return this.displayDataInArray;
 	}
-	
+
 	/**
 	 * Set the entry that is currently viewed This influences the viewer and the cell of the array that is currently highlighted
 	 * 
@@ -1843,14 +1905,14 @@ public class JEXManager {
 			return;
 		}
 		this.viewedEntry = entry;
-		
+
 		// Update viewed data information
 		this.updateDimensionTable();
-		
+
 		// Emit signal of experiment tree change
 		Logs.log("Send signal of viewed entry change", 1, this);
 		SSCenter.defaultCenter().emit(this, VIEWEDENTRY, (Object[]) null);
-		
+
 		// // Set the database / repository info panel
 		// if (this.getSelectedObject() == null) setInfoPanel("SelectedObject",
 		// null);
@@ -1860,7 +1922,7 @@ public class JEXManager {
 		// setInfoPanel("SelectedObject", infoPanel);
 		// }
 	}
-	
+
 	/**
 	 * Return the entry that is currently viewed
 	 * 
@@ -1870,7 +1932,7 @@ public class JEXManager {
 	{
 		return this.viewedEntry;
 	}
-	
+
 	/**
 	 * Set the valid label of entry ENTRY to VALID
 	 * 
@@ -1882,12 +1944,12 @@ public class JEXManager {
 		JEXLabel label = new JEXLabel(JEXEntry.VALID, "" + valid, "");
 		// this.addDataToEntry(entry, label, true);
 		JEXStatics.jexDBManager.saveDataInEntry(entry, label, true);
-		
+
 		// Emit signal of experiment tree change
 		Logs.log("Send signal of entry validity change", 1, this);
 		SSCenter.defaultCenter().emit(this, ENTRYVALID, (Object[]) null);
 	}
-	
+
 	/**
 	 * Return the validity label of entry ENTRY
 	 * 
@@ -1901,11 +1963,11 @@ public class JEXManager {
 		{
 			return true;
 		}
-		
+
 		boolean result = Boolean.parseBoolean(data.getFirstSingle().get(JEXDataSingle.VALUE));
 		return result;
 	}
-	
+
 	/**
 	 * Set the viewed data map
 	 * 
@@ -1918,12 +1980,12 @@ public class JEXManager {
 			return;
 		}
 		this.viewedData = map;
-		
+
 		// Emit signal of experiment tree change
 		Logs.log("Send signal of viewed datamap change", 1, this);
 		SSCenter.defaultCenter().emit(this, DATAVIEWED, (Object[]) null);
 	}
-	
+
 	/**
 	 * Return the viewed data map
 	 * 
@@ -1933,7 +1995,7 @@ public class JEXManager {
 	{
 		return this.viewedData;
 	}
-	
+
 	/**
 	 * Set the dimension table of the data selected
 	 * 
@@ -1946,12 +2008,12 @@ public class JEXManager {
 			return;
 		}
 		this.dimTable = dimTable;
-		
+
 		// Emit signal of experiment tree change
 		Logs.log("Send signal of data dimension table change", 1, this);
 		SSCenter.defaultCenter().emit(this, DATADIMTABLE, (Object[]) null);
 	}
-	
+
 	/**
 	 * Return the dimension table of the data viewed
 	 * 
@@ -1961,11 +2023,11 @@ public class JEXManager {
 	{
 		return this.dimTable;
 	}
-	
+
 	// ---------------------------------------------
 	// Statistics filtering
 	// ---------------------------------------------
-	
+
 	/**
 	 * Return the statistics TNVI of the database
 	 * 
@@ -1976,7 +2038,7 @@ public class JEXManager {
 		// return this.getCurrentDatabase().getStatisticsTNVI();
 		return this.getCurrentDatabase().getTNVI();
 	}
-	
+
 	// /**
 	// * Return the statistics ITN of the database
 	// * @return fITN
@@ -1985,7 +2047,7 @@ public class JEXManager {
 	// getStatisticsITNV(){
 	// return this.getCurrentDatabase().getStatisticsITNV();
 	// }
-	
+
 	/**
 	 * Set the grouping list for the statistics panel
 	 */
@@ -1993,13 +2055,13 @@ public class JEXManager {
 	{
 		this.statsGroups = statGroups;
 		this.getCurrentDatabase().setStatisticsGrouping(statGroups);
-		
+
 		// Send a signal of change of browsed database
 		Logs.log("Send signal of change of statistics grouping", 1, this);
 		SSCenter.defaultCenter().emit(this, STATSGROUPS, (Object[]) null);
 		SSCenter.defaultCenter().emit(this, STATSRESULTS, (Object[]) null);
 	}
-	
+
 	/**
 	 * Return the grouping list for the statistics
 	 * 
@@ -2013,7 +2075,7 @@ public class JEXManager {
 		}
 		return this.statsGroups;
 	}
-	
+
 	/**
 	 * Set the filterset of the databse
 	 * 
@@ -2023,13 +2085,13 @@ public class JEXManager {
 	{
 		this.statsFilterSet = statsFilterSet;
 		this.getCurrentDatabase().setStatisticsFilterSet(statsFilterSet);
-		
+
 		// Emit signal of repository hashmap change
 		Logs.log("Send signal of change of statistics filters", 1, this);
 		SSCenter.defaultCenter().emit(this, STATSFILTERS, (Object[]) null);
 		SSCenter.defaultCenter().emit(this, STATSRESULTS, (Object[]) null);
 	}
-	
+
 	/**
 	 * Return the statistics filter set
 	 * 
@@ -2043,7 +2105,7 @@ public class JEXManager {
 		}
 		return this.statsFilterSet;
 	}
-	
+
 	/**
 	 * Return the grouping of entries for the statistics
 	 * 
@@ -2053,7 +2115,7 @@ public class JEXManager {
 	{
 		return this.getCurrentDatabase().getStatisticsGroupedEntries();
 	}
-	
+
 	/**
 	 * Set the selected object for statistics
 	 * 
@@ -2062,12 +2124,12 @@ public class JEXManager {
 	public void setSelectedStatisticsObject(TypeName object)
 	{
 		this.statsValueObject = object;
-		
+
 		// Send a signal of change of selected object
 		Logs.log("Send signal of change of selected statistics object", 1, this);
 		SSCenter.defaultCenter().emit(this, STATSVALUEOBJ, (Object[]) null);
 	}
-	
+
 	/**
 	 * Return the typename of the selectedobject for statistics
 	 * 
@@ -2077,11 +2139,11 @@ public class JEXManager {
 	{
 		return this.statsValueObject;
 	}
-	
+
 	// ---------------------------------------------
 	// Archiving and consolidating
 	// ---------------------------------------------
-	
+
 	// /**
 	// * Consolidate the entries in the entry set ENTRIES
 	// */
@@ -2100,7 +2162,7 @@ public class JEXManager {
 	//
 	// return true;
 	// }
-	
+
 	/**
 	 * Archive the experiment name EXPNAME into the database DB
 	 * 
@@ -2109,14 +2171,14 @@ public class JEXManager {
 	 */
 	public boolean archiveExperimentIntoDatabase(String expName, JEXDB db)
 	{
-		
+
 		return false;
 	}
-	
+
 	// ---------------------------------------------
 	// Private functions....
 	// ---------------------------------------------
-	
+
 	/**
 	 * Update the current dimension table if necessary
 	 */
@@ -2128,7 +2190,7 @@ public class JEXManager {
 		{
 			return;
 		}
-		
+
 		JEXData data = this.getDataOfTypeNameInEntry(object, entry);
 		if(data == null)
 		{
@@ -2139,7 +2201,7 @@ public class JEXManager {
 		{
 			table = new DimTable(data.getDataMap());
 		}
-		
+
 		// make the default dim
 		DimensionMap dim = new DimensionMap();
 		List<String> dimNames = table.getDimensionNames();
@@ -2153,10 +2215,10 @@ public class JEXManager {
 			}
 			dim.put(dimName, dimValues[0]);
 		}
-		
+
 		Logs.log("Setting the dimTable", 1, this);
 		this.setDataDimensionTable(table);
 		this.setViewedDatamap(dim);
 	}
-	
+
 }

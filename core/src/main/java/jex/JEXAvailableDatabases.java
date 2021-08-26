@@ -235,6 +235,20 @@ public class JEXAvailableDatabases extends JPanel implements ActionListener, Mou
 	}
 	
 	/**
+	 * Open the cloning panel of a database
+	 * 
+	 * @param db
+	 */
+	public void openCloningPanel(JEXDBInfo db, Repository rep)
+	{
+		Logs.log("Cloning database " + db.getDirectory(), 0, this);
+		
+		DatabaseCloningPane dbCloningPane = new DatabaseCloningPane(parent, rep, db);
+		
+		parent.setAlternatePanel(dbCloningPane);
+	}
+	
+	/**
 	 * Delete database with confirmation
 	 * 
 	 * @param db
@@ -571,6 +585,7 @@ public class JEXAvailableDatabases extends JPanel implements ActionListener, Mou
 		private SignalMenuButton dbButton = new SignalMenuButton();
 		private SignalMenuButton editDB = new SignalMenuButton();
 		private SignalMenuButton deleteDB = new SignalMenuButton();
+		private SignalMenuButton cloneDB = new SignalMenuButton();
 		private JPanel infoPane = new JPanel();
 		
 		/**
@@ -599,6 +614,7 @@ public class JEXAvailableDatabases extends JPanel implements ActionListener, Mou
 			// Create the Database button
 			Image dbImage = JEXStatics.iconRepository.getImageWithName(IconRepository.SESSION_DATABASE, 25, 25);
 			dbButton.setImage(dbImage);
+			dbButton.setMouseOverImage(JEXStatics.iconRepository.getImageWithName(IconRepository.SESSION_DATABASE_MOUSEOVER, 25, 25));
 			dbButton.setMinimumSize(new Dimension(40, 35));
 			dbButton.setMaximumSize(new Dimension(40, 35));
 			dbButton.setPreferredSize(new Dimension(40, 35));
@@ -631,12 +647,21 @@ public class JEXAvailableDatabases extends JPanel implements ActionListener, Mou
 			editDB.setImage(iconeditDB);
 			editDB.setBackgroundColor(DisplayStatics.lightBackground);
 			editDB.addActionListener(this);
+			editDB.setToolTipText("Edit Database");
 			
 			Image delete = JEXStatics.iconRepository.getImageWithName(IconRepository.MISC_DELETE, 20, 20);
 			deleteDB.setText(null);
 			deleteDB.setImage(delete);
 			deleteDB.setBackgroundColor(DisplayStatics.lightBackground);
 			deleteDB.addActionListener(this);
+			deleteDB.setToolTipText("Delete Database");
+			
+			Image clone = JEXStatics.iconRepository.getImageWithName(IconRepository.COPY, 20, 20);
+			cloneDB.setText(null);
+			cloneDB.setImage(clone);
+			cloneDB.setBackgroundColor(DisplayStatics.lightBackground);
+			cloneDB.addActionListener(this);
+			cloneDB.setToolTipText("Clone Database");
 			
 			refresh();
 			
@@ -646,6 +671,8 @@ public class JEXAvailableDatabases extends JPanel implements ActionListener, Mou
 			this.add(infoPane);
 			this.add(Box.createHorizontalGlue());
 			this.add(editDB);
+			this.add(Box.createHorizontalStrut(5));
+			this.add(cloneDB);
 			this.add(Box.createHorizontalStrut(5));
 			this.add(deleteDB);
 			this.add(Box.createHorizontalStrut(28));
@@ -704,6 +731,11 @@ public class JEXAvailableDatabases extends JPanel implements ActionListener, Mou
 			{
 				Logs.log("Deleting this database", 1, this);
 				deleteDatabase(database, rep);
+			}
+			if(e.getSource() == cloneDB)
+			{
+				Logs.log("Cloning this database", 1, this);
+				openCloningPanel(database, rep);
 			}
 		}
 		
