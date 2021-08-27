@@ -8,7 +8,6 @@ import function.plugin.plugins.imageProcessing.GaussianBlur2;
 import function.plugin.plugins.imageProcessing.GaussianBlurForcedRadius;
 import function.plugin.plugins.imageProcessing.RankFilters2;
 import function.plugin.plugins.imageProcessing.TIECalculator;
-import ij.ImagePlus;
 import ij.process.Blitter;
 import ij.process.FHT;
 import ij.process.FloatProcessor;

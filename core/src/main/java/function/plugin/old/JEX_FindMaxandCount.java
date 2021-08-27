@@ -1,5 +1,12 @@
 package function.plugin.old;
 
+import java.awt.Point;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.TreeMap;
+
 import Database.DBObjects.JEXData;
 import Database.DBObjects.JEXEntry;
 import Database.DataReader.ImageReader;
@@ -19,18 +26,9 @@ import function.tracker.FindMaxima;
 import ij.ImagePlus;
 import ij.gui.Roi;
 import ij.process.ByteProcessor;
-import ij.process.FloatProcessor;
 import ij.process.ImageProcessor;
 import image.roi.PointList;
 import image.roi.ROIPlus;
-
-import java.awt.Point;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.TreeMap;
-
 import jex.statics.JEXStatics;
 import logs.Logs;
 import tables.DimensionMap;

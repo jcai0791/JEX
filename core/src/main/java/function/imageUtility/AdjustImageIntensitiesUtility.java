@@ -2,32 +2,17 @@ package function.imageUtility;
 
 import java.lang.reflect.Field;
 import java.util.List;
-import java.util.Map.Entry;
 import java.util.TreeMap;
 
 import org.scijava.util.ClassUtils;
 
-import Database.DBObjects.JEXData;
-import Database.DataReader.ImageReader;
-import Database.DataWriter.ImageWriter;
 import Database.Definition.Parameter;
 import Database.Definition.ParameterSet;
-import Database.SingleUserDatabase.JEXWriter;
 import cruncher.VirtualFunctionCruncher;
-import function.plugin.mechanism.InputMarker;
 import function.plugin.mechanism.MarkerConstants;
 import function.plugin.mechanism.ParameterMarker;
-import ij.ImagePlus;
-import ij.process.Blitter;
-import ij.process.FloatBlitter;
-import ij.process.FloatProcessor;
 import ij.process.ImageProcessor;
-import jex.statics.JEXStatics;
 import jex.utilities.FunctionUtility;
-import jex.utilities.ImageUtility;
-import logs.Logs;
-import miscellaneous.Pair;
-import tables.DimensionMap;
 
 public class AdjustImageIntensitiesUtility extends VirtualFunctionCruncher{
 

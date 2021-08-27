@@ -624,6 +624,7 @@ public class JEXManager {
 			public boolean accept(File file) {
 				if (file.getName().endsWith(".jex")) return false;
 				return true;
+				//This code makes the cloned database contain only the structure but not the contents.
 //				else if(file.isDirectory()) return true;
 //				else if(file.getName().endsWith(".jxd")) return true;
 //				return false;

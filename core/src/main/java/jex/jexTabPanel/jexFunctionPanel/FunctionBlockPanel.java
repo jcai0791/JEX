@@ -24,7 +24,6 @@ import java.util.TreeMap;
 
 import javax.swing.BorderFactory;
 import javax.swing.Box;
-import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
@@ -35,16 +34,13 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
 import Database.Definition.ParameterSet;
-import Database.Definition.Type;
 import Database.Definition.TypeName;
 import cruncher.JEXFunction;
 import function.JEXCrunchable;
 import function.plugin.mechanism.JEXCrunchablePlugin;
 import guiObject.FlatRoundedButton;
-import icons.IconRepository;
 import jex.statics.DisplayStatics;
 import jex.statics.JEXDialog;
-import jex.statics.JEXStatics;
 import logs.Logs;
 import miscellaneous.FontUtility;
 import net.miginfocom.swing.MigLayout;
