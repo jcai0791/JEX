@@ -85,6 +85,7 @@ public class JEXDistributionPanelController extends JEXTabPanelController {
 	public void fileListChanged()
 	{
 		List<File> files = this.flistpane.files2Distribute;
+		this.dimensions.get(0).setSizeField(""+(files.size()/this.curTray.entries.size()));
 		this.fileController.setFileList(files);
 	}
 
