@@ -51,6 +51,7 @@ public class Ticket implements Callable<Integer>, Canceler{
 	TreeMap<JEXEntry,Set<JEXData>> outputList = new TreeMap<JEXEntry,Set<JEXData>>();
 	int functionsStarted = 0, functionsFinished = 0;
 	String startTime = "", endTime = "";
+	Long startTimeMilli;
 
 	public boolean autoSave;
 	public Batch parent;
@@ -179,6 +180,8 @@ public class Ticket implements Callable<Integer>, Canceler{
 			Logs.log("Running new ticket ", 1, this);
 
 			this.startTime = DateFormat.getDateTimeInstance().format(new Date());
+			this.startTimeMilli = System.currentTimeMillis();
+			
 			SSCenter.defaultCenter().emit(this, SIG_TicketStarted_NULL, (Object[]) null);
 
 			// Stop if canceled;

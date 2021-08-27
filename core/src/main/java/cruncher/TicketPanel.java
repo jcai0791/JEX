@@ -4,6 +4,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import jex.statics.DisplayStatics;
+import logs.Logs;
 import miscellaneous.FontUtility;
 import net.miginfocom.swing.MigLayout;
 import signals.SSCenter;
@@ -15,6 +16,7 @@ public class TicketPanel {
 	private JLabel funcName = new JLabel(" ");
 	private JLabel funcStart = new JLabel(" ");
 	private JLabel funcEnd = new JLabel(" ");
+	private JLabel funcEst = new JLabel(" ");
 	
 	public TicketPanel(Ticket ticket)
 	{
@@ -33,6 +35,7 @@ public class TicketPanel {
 		this.panel.add(funcName, "left");
 		this.panel.add(funcStart, "right");
 		this.panel.add(funcEnd, "right");
+		this.panel.add(funcEst, "right");
 		this.panel.revalidate();
 		this.panel.repaint();
 		SSCenter.defaultCenter().connect(this.ticket, Ticket.SIG_TicketStarted_NULL, this, "ticketStarted", (Class[]) null);
@@ -43,12 +46,16 @@ public class TicketPanel {
 	public synchronized void ticketStarted()
 	{
 		funcStart.setText("Start Time: " + ticket.startTime);
+		funcEst.setText("Estimated Time: ");
+		funcEst.repaint();
 		funcStart.repaint();
 	}
 	
 	public synchronized void ticketFinished()
 	{
 		funcEnd.setText("End Time: " + ticket.endTime);
+		Logs.log("Start Time: "+ticket.startTime, this);
+		Logs.log("End Time: "+ticket.endTime, this);
 		funcEnd.repaint();
 	}
 	
@@ -56,6 +63,13 @@ public class TicketPanel {
 	{
 		funcEnd.setText("Completed: " + ticket.functionsFinished + " of " + ticket.size() + ", Threads: " + (ticket.functionsStarted - ticket.functionsFinished));
 		funcEnd.repaint();
+		int secondsLeft = (int)Math.round((System.currentTimeMillis()-ticket.startTimeMilli)/1000*(double)(ticket.size()-ticket.functionsFinished)/(double)(ticket.functionsFinished));
+		String time = "";
+		if(secondsLeft<=0) time = "";
+		else if(secondsLeft<60) time = "<1 minute";
+		else if(secondsLeft <3600) time = secondsLeft/60 + " minutes";
+		else time = secondsLeft/3600 + " hours, "+(secondsLeft%3600)/60+" minutes";
+		funcEst.setText("Estimated Time Left : "+time);
 	}
 	
 	public JPanel panel()
