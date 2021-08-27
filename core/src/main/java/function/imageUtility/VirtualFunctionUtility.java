@@ -34,7 +34,7 @@ public class VirtualFunctionUtility{
 
 	public VirtualFunctionUtility(String vfcPath) throws InstantiationException, IllegalAccessException, IOException
 	{
-		Logs.log("Reading from: "+vfcPath, this);
+		//Logs.log("Reading from: "+vfcPath, this);
 		BufferedReader reader = new BufferedReader(new FileReader(vfcPath));
 		String functionName = reader.readLine().split(",")[0];
 
@@ -70,10 +70,10 @@ public class VirtualFunctionUtility{
 
 	}
 	public ImageProcessor call() {
-		long start = System.currentTimeMillis();
+		//long start = System.currentTimeMillis();
 		Boolean b = function.run();
-		Long end = System.currentTimeMillis();
-		Logs.log("Running "+function.getName()+" has returned "+b+". Took "+(end-start)+" milliseconds.", this);
+		//Long end = System.currentTimeMillis();
+		//Logs.log("Running "+function.getName()+" has returned "+b+". Took "+(end-start)+" milliseconds.", this);
 		return function.getOutput();
 
 	}

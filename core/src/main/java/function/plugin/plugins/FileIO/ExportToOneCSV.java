@@ -2,7 +2,6 @@ package function.plugin.plugins.FileIO;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Set;
 import java.util.TreeMap;
@@ -116,6 +115,7 @@ public class ExportToOneCSV extends JEXPlugin {
 		        }
 				if (firstLines.matches("[!-?A-~](.*)")) break;
 			}
+			firstBufferedReader.close();
 		} catch (IOException e3) {
 			e3.printStackTrace();
 		}
@@ -125,8 +125,9 @@ public class ExportToOneCSV extends JEXPlugin {
 		try 
 		{
 			java.io.FileReader emptyTest = new java.io.FileReader(dst);
+			emptyTest.close();
 		} 
-		catch (FileNotFoundException e2) 
+		catch (IOException e2) 
 		{
 			try 
 			{

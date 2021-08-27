@@ -113,5 +113,9 @@ public class DatabaseCloningPane extends JPanel implements ActionListener {
 			// Reset the datrabase chooser
 			parent.setAlternatePanel(null);
 		}
+		if(e.getSource() == cancelButton) {
+			Logs.log("Database cloning canceled", this);
+			parent.setAlternatePanel(null);
+		}
 	}
 }
