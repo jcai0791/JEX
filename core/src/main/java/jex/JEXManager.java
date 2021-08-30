@@ -586,7 +586,7 @@ public class JEXManager {
 	/**
 	 * Clone a Database
 	 */
-	public boolean cloneDatabase(JEXDBInfo DBInfo, String type, Repository rep, String name, String info, String password)
+	public boolean cloneDatabase(JEXDBInfo DBInfo, String type, Repository rep, String name, String info, String password, boolean keepData)
 	{
 		Logs.log("Creating Database", 1, this);
 
@@ -619,22 +619,43 @@ public class JEXManager {
 
 		File dst = new File(db.getDirectory());
 		File src = new File(DBInfo.getDirectory());
-		FileFilter fileFilter = new FileFilter() 
-		{
-			public boolean accept(File file) {
-				if (file.getName().endsWith(".jex")) return false;
-				return true;
-				//This code makes the cloned database contain only the structure but not the contents.
-//				else if(file.isDirectory()) return true;
-//				else if(file.getName().endsWith(".jxd")) return true;
-//				return false;
+		if(keepData) {
+			FileFilter fileFilter = new FileFilter() 
+			{
+				public boolean accept(File file) {
+					if (file.getName().endsWith(".jex")) return false;
+					return true;
+					//This code makes the cloned database contain only the structure but not the contents.
+					//				else if(file.isDirectory()) return true;
+					//				else if(file.getName().endsWith(".jxd")) return true;
+					//				return false;
+				}
+			};
+			try {
+				FileUtils.copyDirectory(src, dst,fileFilter, false);
+			} catch (IOException e) {
+				Logs.log("Error copying database", this);
+				e.printStackTrace();
 			}
-		};
-		try {
-			FileUtils.copyDirectory(src, dst,fileFilter, false);
-		} catch (IOException e) {
-			Logs.log("Error copying database", this);
-			e.printStackTrace();
+		}
+		else {
+			FileFilter fileFilter = new FileFilter() 
+			{
+				public boolean accept(File file) {
+					if (file.getName().endsWith(".jex")) return false;
+					//This code makes the cloned database contain only the structure but not the contents.
+					else if(file.isDirectory()) return true;
+					else if(file.getName().endsWith(".jxd")) return true;
+					else if(file.getName().endsWith(".xml")) return true;
+					return false;
+				}
+			};
+			try {
+				FileUtils.copyDirectory(src, dst,fileFilter, false);
+			} catch (IOException e) {
+				Logs.log("Error copying database", this);
+				e.printStackTrace();
+			}
 		}
 
 		// Send a signal of change of repository list

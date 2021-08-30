@@ -15,6 +15,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
@@ -29,6 +30,7 @@ public class DatabaseCloningPane extends JPanel implements ActionListener {
 	private JTextField nameField = new JTextField();
 	private JTextField infoField = new JTextField();
 	private JTextField passField = new JTextField();
+	private JCheckBox checkBox = new JCheckBox();
 	private Repository rep;
 	private JEXDatabaseChooser parent;
 	private JButton doItButton;
@@ -91,6 +93,10 @@ public class DatabaseCloningPane extends JPanel implements ActionListener {
 		this.add(passLabel, cc.xy(1, 3));
 		this.add(passField, cc.xywh(2, 3, 2, 1));
 		
+		JLabel checkLabel = new JLabel("Clone data?");
+		this.add(checkLabel, cc.xy(1,4));
+		this.add(checkBox, cc.xy(2,4));
+		
 		this.add(doItButton, cc.xy(2, 5));
 		this.add(cancelButton,cc.xy(2,6));
 	}
@@ -107,7 +113,8 @@ public class DatabaseCloningPane extends JPanel implements ActionListener {
 			String name = nameField.getText();
 			String info = infoField.getText();
 			String pass = passField.getText();
-			boolean done = JEXStatics.jexManager.cloneDatabase(db, JEXDB.LOCAL_DATABASE, rep, name, info, pass);
+			boolean keepData = checkBox.isSelected();
+			boolean done = JEXStatics.jexManager.cloneDatabase(db, JEXDB.LOCAL_DATABASE, rep, name, info, pass, keepData);
 			Logs.log("Database creation returned " + done, 1, this);
 			
 			// Reset the datrabase chooser
