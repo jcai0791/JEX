@@ -136,6 +136,7 @@ public class JEXDataPanelLine extends JPanel implements ActionListener, MouseLis
 	public void mousePressed(MouseEvent e)
 	{}
 
+	@SuppressWarnings("unused")
 	public void mouseReleased(MouseEvent e)
 	{
 		if(e.getSource() == this)

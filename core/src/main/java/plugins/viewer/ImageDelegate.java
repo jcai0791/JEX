@@ -11,7 +11,9 @@ import image.roi.Vect;
 import java.awt.Image;
 import java.awt.Point;
 import java.awt.Rectangle;
+import java.io.IOException;
 
+import function.imageUtility.VirtualFunctionUtility;
 import logs.Logs;
 import signals.SSCenter;
 
@@ -57,7 +59,19 @@ public class ImageDelegate {
 		}
 		this.imagePath = path;
 		Logs.log("Opening image at path " + this.imagePath, 1, this);
-		this.setImage(new ImagePlus(path));
+		if(path.endsWith(".vfn")) {
+			ImageProcessor ip = null;
+			try {
+				VirtualFunctionUtility vfu = new VirtualFunctionUtility(imagePath);
+				ip = vfu.call();
+			} catch (InstantiationException | IllegalAccessException | IOException e) {
+				e.printStackTrace();
+			}
+			this.setImage(new ImagePlus("Image", ip));
+		}
+		else {
+			this.setImage(new ImagePlus(path));
+		}
 	}
 	
 	/**

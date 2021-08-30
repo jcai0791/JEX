@@ -416,14 +416,14 @@ public class WeightedMeanFilter extends JEXPlugin {
 		if(outputImageMap.size() > 0)
 		{
 			this.output = ImageWriter.makeImageStackFromPaths("temp",outputImageMap);
-			if(this.virtualOutput) this.output.setDataObjectFlavor("Virtual Function");
+			if(this.virtualOutput) this.output.setDataObjectFlavor(JEXData.FLAVOR_VIRTUAL_FUNCTION);
 		}
 
 		// Save a threshold image if necessary
 		if(outputMaskMap.size() > 0)
 		{
 			this.maskOutput = ImageWriter.makeImageStackFromPaths("temp", outputMaskMap);
-			if(this.virtualOutput) this.maskOutput.setDataObjectFlavor("Virtual Function");
+			if(this.virtualOutput) this.maskOutput.setDataObjectFlavor(JEXData.FLAVOR_VIRTUAL_FUNCTION);
 		}
 
 		// Return status

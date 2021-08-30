@@ -447,7 +447,7 @@ public class JEX_ImageFilters extends JEXCrunchable {
 		}
 
 		JEXData output1 = ImageWriter.makeImageStackFromPaths(outputNames[0].getName(), outputImageMap);
-		if(Boolean.parseBoolean(parameters.getValueOfParameter("Virtual Output"))) output1.setDataObjectFlavor("Virtual Function");
+		if(Boolean.parseBoolean(parameters.getValueOfParameter("Virtual Output"))) output1.setDataObjectFlavor(JEXData.FLAVOR_VIRTUAL_FUNCTION);
 		// Set the outputs
 		realOutputs.add(output1);
 
