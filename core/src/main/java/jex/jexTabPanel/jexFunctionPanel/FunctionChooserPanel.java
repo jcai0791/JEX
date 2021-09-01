@@ -2,6 +2,7 @@ package jex.jexTabPanel.jexFunctionPanel;
 
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.TreeMap;
@@ -12,8 +13,11 @@ import javax.swing.Icon;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JTextField;
 import javax.swing.JTree;
 import javax.swing.ToolTipManager;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.DefaultMutableTreeNode;
@@ -36,7 +40,7 @@ import function.JEXCrunchable;
 /**
  * FunctionChooserPanel class
  */
-class FunctionChooserPanel {
+class FunctionChooserPanel implements DocumentListener{
 	
 	// Main GUI
 	JEXFunctionPanel parent;
@@ -46,6 +50,7 @@ class FunctionChooserPanel {
 	JScrollPane treeScrollPane; // = new
 	// JScrollPane();
 	FunctionTree functionTree;
+	JTextField searchBox;
 	
 	// JButton closeButton = new JButton("CLOSE");
 	
@@ -65,15 +70,19 @@ class FunctionChooserPanel {
 		
 		// Main panel
 		this.panel.setBackground(Color.WHITE);
-		this.panel.setLayout(new MigLayout("flowy, ins 2", "[fill,grow]", "[]2[fill,grow]"));
+		this.panel.setLayout(new MigLayout("debug, flowy, ins 2", "[fill,grow]", "[]2[]2[fill,grow]"));
 		
 		// Build the selector header
 		JLabel title1 = new JLabel("FUNCTION LIBRARY");
+		searchBox = new JTextField("");
+		searchBox.getDocument().addDocumentListener(this);
+		searchBox.setMaximumSize(new Dimension(9999, 25));
 		JPanel headerPane1 = new JPanel(new MigLayout("flowy,center,ins 1", "[center]", "[center]"));
 		headerPane1.setBackground(DisplayStatics.menuBackground);
 		title1.setFont(FontUtility.boldFont);
 		headerPane1.add(title1);
 		this.panel.add(headerPane1, "growx");
+		this.panel.add(searchBox, "dock center, growx");
 		
 		// Function tree panel
 		this.functionTree = new FunctionTree();
@@ -150,6 +159,24 @@ class FunctionChooserPanel {
 	{
 		return this.getSelectedFunction() != null;
 	}
+
+	@Override
+	public void changedUpdate(DocumentEvent arg0) {
+		
+		
+	}
+
+	@Override
+	public void insertUpdate(DocumentEvent arg0) {
+		this.functionTree.showSearch(this.searchBox.getText());
+		
+	}
+
+	@Override
+	public void removeUpdate(DocumentEvent arg0) {
+		this.functionTree.showSearch(this.searchBox.getText());
+		
+	}
 }
 
 // ----------------------------------------------------
@@ -199,6 +226,33 @@ class FunctionTree extends JTree implements TreeSelectionListener {
 		
 		this.setModel(treeModel);
 		// this.expandAll();
+	}
+	
+	public void showSearch(String search) {
+		if(search.equals("")) {
+			fillTree();
+		}
+		else {
+			this.top.removeAllChildren();
+			DefaultTreeModel treeModel = new DefaultTreeModel(this.top);
+			
+			// get all IDs
+			//Logs.log("Filling tree ", 1, this);
+			
+			TreeSet<String> toolboxes = CrunchFactory.getToolboxes();
+			for (String tb : toolboxes)
+			{
+				ToolBoxNode dbNode = new ToolBoxNode(tb, search);
+				if(dbNode.getChildCount()>0) this.top.add(dbNode);
+			}
+			
+			// MatlabToolboxNode dbNode = new MatlabToolboxNode();
+			// this.top.add(dbNode);
+			
+			this.setModel(treeModel);
+			this.expandAll();
+		}
+		
 	}
 	
 	/**
@@ -260,6 +314,11 @@ class FunctionTree extends JTree implements TreeSelectionListener {
 			this.toolbox = toolbox;
 			this.fill();
 		}
+		public ToolBoxNode(String toolbox, String search) {
+			super(toolbox);
+			this.toolbox = toolbox;
+			this.fill(search);
+		}
 		
 		public void fill()
 		{
@@ -275,6 +334,17 @@ class FunctionTree extends JTree implements TreeSelectionListener {
 				//				}	
 				FunctionNode dbNode = new FunctionNode(c);
 				this.add(dbNode);
+			}
+		}
+		public void fill(String search) {
+			this.removeAllChildren();
+			TreeMap<String,JEXCrunchable> availableFunctions = CrunchFactory.getJEXCrunchablesInToolbox(this.toolbox);
+			for (JEXCrunchable c : availableFunctions.values())
+			{
+				if((c.getName()+" "+c.getInfo()).toLowerCase().contains(search.toLowerCase())) {
+					FunctionNode dbNode = new FunctionNode(c);
+					this.add(dbNode);
+				}
 			}
 		}
 	}
