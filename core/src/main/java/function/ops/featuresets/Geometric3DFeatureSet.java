@@ -58,6 +58,7 @@ import net.imglib2.type.numeric.RealType;
  * @param <I>
  * @param <O>
  */
+@SuppressWarnings("unused")
 @Plugin(type = FeatureSet.class, label = "Geometric Features 3D", description = "Calculates Geometric Features on 3D LabelRegions")
 public class Geometric3DFeatureSet<L, O extends RealType<O>> extends AbstractOpRefFeatureSet<LabelRegion<L>, O>
 		implements DimensionBoundFeatureSet<LabelRegion<L>, O> {

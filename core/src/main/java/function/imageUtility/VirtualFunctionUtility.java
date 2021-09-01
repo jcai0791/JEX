@@ -73,7 +73,7 @@ public class VirtualFunctionUtility{
 		//long start = System.currentTimeMillis();
 		Boolean b = function.run();
 		//Long end = System.currentTimeMillis();
-		//Logs.log("Running "+function.getName()+" has returned "+b+". Took "+(end-start)+" milliseconds.", this);
+		Logs.log("Running "+function.getName()+" has returned "+b, this);
 		return function.getOutput();
 
 	}
