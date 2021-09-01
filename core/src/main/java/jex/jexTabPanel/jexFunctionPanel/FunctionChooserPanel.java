@@ -70,7 +70,7 @@ class FunctionChooserPanel implements DocumentListener{
 		
 		// Main panel
 		this.panel.setBackground(Color.WHITE);
-		this.panel.setLayout(new MigLayout("debug, flowy, ins 2", "[fill,grow]", "[]2[]2[fill,grow]"));
+		this.panel.setLayout(new MigLayout("flowy, ins 2", "[fill,grow]", "[]2[]2[fill,grow]"));
 		
 		// Build the selector header
 		JLabel title1 = new JLabel("FUNCTION LIBRARY");
