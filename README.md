@@ -11,13 +11,13 @@ Google "Download Java 1.8 Oracle", following the link for the Java (v1.8.X) SE s
 
 #### Downloading the JEX Executable Version
 
-Executable jars and simple exectuable scripts to run those jars with specific java heap space arguments for increasing the amount of RAM that can be used are available for download at [sourceforge](http://sourceforge.net/projects/jextools/). Simply save and unzip the file anywhere you would like (except maybe your root directory of your hard drive such as 'C:/' as that is often weirdly write protected and can cause issues) and double-click the "JEX for Mac" or "JEX for Windows" exectubale script depending on your operating system (Linux users can double-click the jar directly or run the jar from the command line to change the memory settings). This will start a terminal window that will show information regarding any actions that JEX is taking as well as error information that would be very useful for debugging issues you might run into :-).
+Executable jars and simple exectuable scripts to run those jars with specific java heap space arguments for increasing the amount of RAM that can be used are available for download at [sourceforge](http://sourceforge.net/projects/jexperiment/). Simply save and unzip the file anywhere you would like (except maybe your root directory of your hard drive such as 'C:/' as that is often weirdly write protected and can cause issues) and double-click the "JEX for Mac" or "JEX for Windows" exectubale script depending on your operating system (Linux users can double-click the jar directly or run the jar from the command line to change the memory settings). This will start a terminal window that will show information regarding any actions that JEX is taking as well as error information that would be very useful for debugging issues you might run into :-).
 
 You can update your version of JEX to the most recent stable release or developmental version at any time by simply clicking the "Update" button in the top-left corner of JEX when viewing a database. However, to create and view a database, follow the mini-tutorial below titled "Getting Started".
 
 #### Reporting Bugs/Issues
 
-Please go to [https://github.com/jaywarrick/JEX/issues](https://github.com/jaywarrick/JEX/issues) to describe and submit the issue, which will be emailed to JEX's developers.
+Please go to [https://github.com/jcai0791/JEX/issues](https://github.com/jcai0791/JEX/issues) to describe and submit the issue, which will be emailed to JEX's developers. Note: Jay Warrick is no longer actively maintaing JEX. JEX is currently maintained by Joseph Cai (jbcai@wisc.edu).
 
 #### Getting started
 
