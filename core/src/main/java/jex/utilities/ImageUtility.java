@@ -9,11 +9,14 @@ import java.awt.color.ColorSpace;
 import java.awt.image.BufferedImage;
 import java.awt.image.BufferedImageOp;
 import java.awt.image.ColorConvertOp;
+import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
 import java.util.TreeMap;
 import java.util.Vector;
 
+import Database.DBObjects.JEXData;
+import function.imageUtility.VirtualFunctionUtility;
 import function.ops.histogram.PolynomialRegression;
 import function.plugin.plugins.featureExtraction.FeatureUtils;
 import function.plugin.plugins.imageProcessing.GaussianBlurForcedRadius;
@@ -71,6 +74,22 @@ public class ImageUtility {
 		return bimage;
 	}
 
+	public static ImageProcessor getImageProcessor(JEXData imageData, TreeMap<DimensionMap, String> imageMap, DimensionMap map) {
+		//Virtual Function support
+		ImageProcessor ip = null;
+		if(imageData.hasVirtualFunctionFlavor()) {
+			VirtualFunctionUtility vfu;
+			try {
+				vfu = new VirtualFunctionUtility(imageMap.get(map));
+				ip = vfu.call();
+			} catch (InstantiationException | IllegalAccessException | IOException e) {
+				e.printStackTrace();
+			}
+		}
+		else ip = (new ImagePlus(imageMap.get(map)).getProcessor());
+		return ip;
+	}
+	
 	public static ImagePlus makeImagePlusStackFromJEXStack(List<DimensionMap> maps, TreeMap<DimensionMap,String> files)
 	{
 		ImageStack im = null;
