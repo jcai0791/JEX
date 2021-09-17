@@ -303,16 +303,7 @@ public class WeightedMeanFilter extends JEXPlugin {
 				continue;
 			}
 			
-			FloatProcessor fp = null;
-			if(imageData.hasVirtualFunctionFlavor()) {
-				try {
-					VirtualFunctionUtility vfu = new VirtualFunctionUtility(imageMap.get(map));
-					fp = vfu.call().convertToFloatProcessor();
-				} catch (InstantiationException | IllegalAccessException | IOException e1) {
-					e1.printStackTrace();
-				}
-			}
-			else fp = (new ImagePlus(imageMap.get(map)).getProcessor().convertToFloatProcessor());
+			FloatProcessor fp = ImageUtility.getImageProcessor(imageData, imageMap, map).convertToFloatProcessor();
 			FloatProcessor mp = null;
 			if(maskData != null && maskMap != null)
 			{

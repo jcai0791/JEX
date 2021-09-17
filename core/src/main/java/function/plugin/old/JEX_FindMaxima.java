@@ -1,5 +1,9 @@
 package function.plugin.old;
 
+import java.awt.Shape;
+import java.util.HashMap;
+import java.util.TreeMap;
+
 import Database.DBObjects.JEXData;
 import Database.DBObjects.JEXEntry;
 import Database.DataReader.ImageReader;
@@ -10,20 +14,13 @@ import Database.Definition.ParameterSet;
 import Database.Definition.TypeName;
 import function.JEXCrunchable;
 import function.imageUtility.MaximumFinder;
-import function.imageUtility.VirtualFunctionUtility;
 import ij.ImagePlus;
 import ij.gui.Roi;
-import ij.process.ImageProcessor;
 import image.roi.IdPoint;
 import image.roi.PointList;
 import image.roi.ROIPlus;
-
-import java.awt.Shape;
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.TreeMap;
-
 import jex.statics.JEXStatics;
+import jex.utilities.ImageUtility;
 import tables.DimensionMap;
 
 /**
@@ -252,14 +249,7 @@ public class JEX_FindMaxima extends JEXCrunchable {
 				
 				if(!imageData.hasVirtualFunctionFlavor()) ip = new ImagePlus(imageMap.get(map));
 				else {
-					try {
-						VirtualFunctionUtility vfu = new VirtualFunctionUtility(imageMap.get(map));
-						ImageProcessor ip2 = vfu.call();
-						ip = new ImagePlus("Virtual Image",ip2);
-						
-					} catch (InstantiationException | IllegalAccessException | IOException e1) {
-						e1.printStackTrace();
-					}
+					ip = new ImagePlus("Virtual Image",(ImageUtility.getImageProcessor(imageData,imageMap,map)));
 				}
 				
 				roi = null;

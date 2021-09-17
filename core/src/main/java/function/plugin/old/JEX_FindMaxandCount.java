@@ -1,7 +1,6 @@
 package function.plugin.old;
 
 import java.awt.Point;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -21,7 +20,6 @@ import function.GraphicalFunctionWrap;
 import function.ImagePanel;
 import function.ImagePanelInteractor;
 import function.JEXCrunchable;
-import function.imageUtility.VirtualFunctionUtility;
 import function.tracker.FindMaxima;
 import ij.ImagePlus;
 import ij.gui.Roi;
@@ -30,6 +28,7 @@ import ij.process.ImageProcessor;
 import image.roi.PointList;
 import image.roi.ROIPlus;
 import jex.statics.JEXStatics;
+import jex.utilities.ImageUtility;
 import logs.Logs;
 import tables.DimensionMap;
 
@@ -286,18 +285,7 @@ class FindMaxHelperFunction2 implements GraphicalCrunchingEnabling, ImagePanelIn
 		int minradius = Integer.parseInt(parameters.getValueOfParameter("Min Cell Radius"));
 		int threshold = Integer.parseInt(params.getValueOfParameter("Threshold"));
 		DimensionMap map = dimensions.get(0);
-		String imPath = images.get(map);
-
-		ImageProcessor fp = null;
-		if(imset.hasVirtualFunctionFlavor()) {
-			try {
-				VirtualFunctionUtility vfu = new VirtualFunctionUtility(imPath);
-				fp = vfu.call();
-			} catch (InstantiationException | IllegalAccessException | IOException e1) {
-				e1.printStackTrace();
-			}
-		}
-		else fp = (new ImagePlus(imPath).getProcessor());
+		ImageProcessor fp = ImageUtility.getImageProcessor(imset,images, map);
 		
 		if(Boolean.parseBoolean(params.getValueOfParameter("Auto Threshold On?"))) {
 			ByteProcessor imp = (ByteProcessor) fp.convertToByte(true);
@@ -382,14 +370,7 @@ class FindMaxHelperFunction2 implements GraphicalCrunchingEnabling, ImagePanelIn
 		
 		if(!imset.hasVirtualFunctionFlavor()) im = new ImagePlus(imPath);
 		else {
-			try {
-				VirtualFunctionUtility vfu = new VirtualFunctionUtility(imPath);
-				ImageProcessor ip = vfu.call();
-				im = new ImagePlus("Virtual Image",ip);
-				
-			} catch (InstantiationException | IllegalAccessException | IOException e1) {
-				e1.printStackTrace();
-			}
+			im = new ImagePlus("Virtual Image",(ImageUtility.getImageProcessor(imset,images,map)));
 		}
 		
 		if(Boolean.parseBoolean(params.getValueOfParameter("Auto Threshold On?"))) {

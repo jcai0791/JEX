@@ -36,6 +36,7 @@ import inra.ijpb.binary.BinaryImages;
 import inra.ijpb.watershed.Watershed;
 import jex.statics.JEXDialog;
 import jex.statics.JEXStatics;
+import jex.utilities.ImageUtility;
 import logs.Logs;
 import miscellaneous.CSVList;
 import miscellaneous.JEXCSVWriter;
@@ -371,16 +372,7 @@ public class JEX_FindMaximaSegmentation extends JEXCrunchable {
 				
 				//Virtual Function support
 				ImagePlus im = new ImagePlus(pathToGet);
-				FloatProcessor ip = null;
-				if(imageData.hasVirtualFunctionFlavor()) {
-					try {
-						VirtualFunctionUtility vfu = new VirtualFunctionUtility(imageMap.get(map));
-						ip = vfu.call().convertToFloatProcessor();
-					} catch (InstantiationException | IllegalAccessException | IOException e1) {
-						e1.printStackTrace();
-					}
-				}
-				else ip = (new ImagePlus(imageMap.get(map)).getProcessor().convertToFloatProcessor());
+				FloatProcessor ip = ImageUtility.getImageProcessor(imageData, imageMap, map).convertToFloatProcessor();
 				im.setProcessor(ip);
 				
 				double threshold;

@@ -1,6 +1,5 @@
 package function.plugin.plugins.imageProcessing;
 
-import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.List;
 import java.util.TreeMap;
@@ -14,7 +13,6 @@ import Database.DataReader.ImageReader;
 import Database.DataWriter.ImageWriter;
 import Database.Definition.Parameter;
 import Database.SingleUserDatabase.JEXWriter;
-import function.imageUtility.VirtualFunctionUtility;
 import function.plugin.mechanism.InputMarker;
 import function.plugin.mechanism.JEXPlugin;
 import function.plugin.mechanism.MarkerConstants;
@@ -23,6 +21,7 @@ import function.plugin.mechanism.ParameterMarker;
 import ij.process.ImageProcessor;
 import jex.statics.JEXStatics;
 import jex.utilities.FunctionUtility;
+import jex.utilities.ImageUtility;
 import tables.DimensionMap;
 
 /**
@@ -145,21 +144,14 @@ public class AdjustImageIntensities extends JEXPlugin {
 				inputs.put("Image",imageMap.get(map));
 				String virtualImagePath = JEXWriter.saveVirtualImage(inputs,parameters,"AdjustImageIntensities");
 				outputImageMap.put(map.copy(),virtualImagePath);
+				this.output.setDataObjectFlavor(JEXData.FLAVOR_VIRTUAL_FUNCTION);
 				continue;
 			}
 
 			//Virtual Function support
 
 			if(imageData.hasVirtualFunctionFlavor()) {
-				ImageProcessor ip = null;
-				VirtualFunctionUtility vfu;
-				try {
-					vfu = new VirtualFunctionUtility(imageMap.get(map));
-					ip = vfu.call();
-				} catch (InstantiationException | IllegalAccessException | IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
+				ImageProcessor ip = ImageUtility.getImageProcessor(imageData, imageMap, map);
 				// Adjust the image
 				FunctionUtility.imAdjust(ip, oldMin, oldMax, newMin, newMax, gamma);
 				

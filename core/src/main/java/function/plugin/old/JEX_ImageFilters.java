@@ -1,6 +1,5 @@
 package function.plugin.old;
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.TreeMap;
 
@@ -13,7 +12,6 @@ import Database.Definition.ParameterSet;
 import Database.Definition.TypeName;
 import Database.SingleUserDatabase.JEXWriter;
 import function.JEXCrunchable;
-import function.imageUtility.VirtualFunctionUtility;
 import function.plugin.plugins.imageProcessing.GaussianBlur2;
 import function.plugin.plugins.imageProcessing.GaussianBlurForcedRadius;
 import function.plugin.plugins.imageProcessing.RankFilters2;
@@ -277,16 +275,7 @@ public class JEX_ImageFilters extends JEXCrunchable {
 				continue;
 			}
 			
-			ImageProcessor ip = null;
-			if(imageData.hasVirtualFunctionFlavor()) {
-				try {
-					VirtualFunctionUtility vfu = new VirtualFunctionUtility(imageMap.get(map));
-					ip = vfu.call().convertToFloat();
-				} catch (InstantiationException | IllegalAccessException | IOException e1) {
-					e1.printStackTrace();
-				}
-			}
-			else ip = (new ImagePlus(imageMap.get(map)).getProcessor().convertToFloat());
+			ImageProcessor ip = ImageUtility.getImageProcessor(imageData, imageMap, map);
 			ImageProcessor orig = null;
 			
 			if(method.equals(OPEN_TOPHAT) || method.equals(CLOSE_TOPHAT) || method.equals(SNR) || method.equals(NSR) || method.equals(DOG))

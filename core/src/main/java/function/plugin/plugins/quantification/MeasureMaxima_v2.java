@@ -22,6 +22,7 @@ import function.plugin.mechanism.ParameterMarker;
 import function.singleCellAnalysis.SingleCellUtility;
 import ij.ImagePlus;
 import ij.measure.Measurements;
+import ij.process.ImageProcessor;
 import ij.process.ImageStatistics;
 import image.roi.IdPoint;
 import image.roi.PointList;
@@ -29,6 +30,7 @@ import image.roi.ROIPlus;
 import image.roi.ROIPlus.PatternRoiIterator;
 import jex.statics.JEXDialog;
 import jex.statics.JEXStatics;
+import jex.utilities.ImageUtility;
 import logs.Logs;
 import tables.Dim;
 import tables.DimTable;
@@ -257,7 +259,9 @@ public class MeasureMaxima_v2 extends JEXPlugin {
 				{
 					return false;
 				}
-				im = new ImagePlus(paths.get(imMap));
+				ImageProcessor ip = ImageUtility.getImageProcessor(imageData, paths, imMap);
+				if(!imageData.hasVirtualFunctionFlavor()) im = new ImagePlus(paths.get(imMap));
+				else im = new ImagePlus("Image", ip);
 
 
 				// In case the maxima roi has a color dim, cycle through the color dimension to grab the 
@@ -419,6 +423,8 @@ public class MeasureMaxima_v2 extends JEXPlugin {
 			color = this.normalizeName(color);
 		}
 
+		//This is where the data gets the X and Y
+		// TODO look at this ask Terry if he wants this
 		// Write the data to the ongoing file
 		if(color == null || color.equals(firstChannel))
 		{
