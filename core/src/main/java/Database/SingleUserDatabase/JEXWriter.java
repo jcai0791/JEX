@@ -1043,7 +1043,7 @@ public class JEXWriter {
 	 * @param imagePath
 	 * @param parameters
 	 * @param functionName
-	 * @return
+	 * @return path
 	 */
 	public static String saveVirtualImage(TreeMap<String,String> inputs, TreeMap<String,Parameter> parameters, String functionName) {
 		// Create the file path

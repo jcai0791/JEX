@@ -163,6 +163,7 @@ public class JEXDataPanelLine extends JPanel implements ActionListener, MouseLis
 				{
 					new ImageBrowser(entries, this.objectTN);
 				}
+				else Logs.log("No entries selected", this);
 			}
 			else if(this.objectTN.getType().matches(JEXData.VALUE))
 			{
@@ -172,6 +173,7 @@ public class JEXDataPanelLine extends JPanel implements ActionListener, MouseLis
 					// new ValueBrowser(entries,this.objectTN);
 					new ValueBrowserController(entries, this.objectTN);
 				}
+				else Logs.log("No entries selected", this);
 			}
 			else if(this.objectTN.getType().matches(JEXData.FILE))
 			{
@@ -187,6 +189,7 @@ public class JEXDataPanelLine extends JPanel implements ActionListener, MouseLis
 					{
 						this.openFileInEntry(entries.first());
 					}
+					else Logs.log("No entries selected", this);
 				}
 			}
 			else if(this.objectTN.getType().matches(JEXData.MOVIE))
@@ -223,6 +226,7 @@ public class JEXDataPanelLine extends JPanel implements ActionListener, MouseLis
 							Logs.log("Error opening file... Path = " + path, 1, this);
 						}
 					}
+					else Logs.log("No entries selected", this);
 				}
 			}
 			else if(this.objectTN.getType().matches(JEXData.WORKFLOW))// Load the
@@ -240,6 +244,7 @@ public class JEXDataPanelLine extends JPanel implements ActionListener, MouseLis
 				}
 				if(appropriateEntry == null)
 				{
+					Logs.log("No entries selected", this);
 					return;
 				}
 				JEXData data = JEXStatics.jexManager.getDataOfTypeNameInEntry(objectTN, appropriateEntry);
@@ -269,6 +274,7 @@ public class JEXDataPanelLine extends JPanel implements ActionListener, MouseLis
 					//					viewer.setFile(JEXWriter.getDatabaseFolder() + File.separator + data.getDetachedRelativePath());
 					//					viewer.show();
 				}
+				else Logs.log("No entries selected", this);
 			}
 		}
 		else if(e.getSource() == dataButton)
@@ -283,6 +289,8 @@ public class JEXDataPanelLine extends JPanel implements ActionListener, MouseLis
 		if(data != null)
 		{
 			TreeMap<DimensionMap,String> paths = FileReader.readObjectToFilePathTable(data);
+			//JPanel textPanel = new JPanel();
+			
 			String path = paths.firstEntry().getValue();
 			try
 			{

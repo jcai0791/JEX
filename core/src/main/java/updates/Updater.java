@@ -44,7 +44,7 @@ public class Updater {
 	
 	public static void attemptJEXUpdate()
 	{		
-		JOptionPane.showMessageDialog(null, "Updating is currently not working.\nFor the latest version, download the code from https://github.com/jcai0791/JEX\nNeed help or more info? Contact me at jbcai@wisc.edu", "Update Unavailable", JOptionPane.INFORMATION_MESSAGE);
+		JOptionPane.showMessageDialog(null, "Updating is currently not working.\nFor the latest version, download from https://sourceforge.net/projects/jexperiment/files/\nNeed help or more info? Contact me at jbcai@wisc.edu", "Update Unavailable", JOptionPane.INFORMATION_MESSAGE);
 		if(runningFromJar) return;
 		JEXStatics.statusBar.setStatusText("Attempting to update JEX...");
 		// Check to see if we are running from an executable version of JEX
@@ -91,7 +91,7 @@ public class Updater {
 		boolean success = updateJEXFilesWithThisZip(download, pathOfJEXExecutables);
 		if(!success)
 		{
-			Logs.log("Unable to update. We'll try nextTime.", Updater.class);
+			Logs.log("Unable to update. We'll try next Time.", Updater.class);
 			JEXStatics.statusBar.setStatusText("Couldn't replace old JEX files. Update aborted.");
 			return;
 		}
@@ -123,7 +123,6 @@ public class Updater {
 			}
 			catch (MalformedURLException e1)
 			{
-				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			}
 			catch (IOException e)

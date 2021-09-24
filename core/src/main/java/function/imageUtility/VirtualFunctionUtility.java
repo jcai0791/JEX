@@ -42,7 +42,7 @@ public class VirtualFunctionUtility{
 		if(functionName.equals("WeightedMeanFilter")) function = new WeightedMeanFilterUtility();
 		else if(functionName.equals("ImageFilter")) function = new ImageFilterUtility();
 		else if(functionName.equals("AdjustImageIntensities")) function = new AdjustImageIntensitiesUtility();
-
+		
 
 		String line = "";
 		List<List<String>> table = new ArrayList<List<String>>();

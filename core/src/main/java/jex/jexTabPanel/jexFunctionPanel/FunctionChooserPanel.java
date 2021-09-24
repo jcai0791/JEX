@@ -75,6 +75,7 @@ class FunctionChooserPanel implements DocumentListener{
 		// Build the selector header
 		JLabel title1 = new JLabel("FUNCTION LIBRARY");
 		searchBox = new JTextField("");
+		searchBox.setToolTipText("Search");
 		searchBox.getDocument().addDocumentListener(this);
 		searchBox.setMaximumSize(new Dimension(9999, 25));
 		JPanel headerPane1 = new JPanel(new MigLayout("flowy,center,ins 1", "[center]", "[center]"));

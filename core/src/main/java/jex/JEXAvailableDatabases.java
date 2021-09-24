@@ -161,6 +161,7 @@ public class JEXAvailableDatabases extends JPanel implements ActionListener, Mou
 		
 		// Creating file chooser to open user preferences
 		JFileChooser fc = new JFileChooser();
+		fc.setDialogTitle("Choose a folder");
 		fc.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
 		
 		fc.setPreferredSize(new Dimension(600,800));

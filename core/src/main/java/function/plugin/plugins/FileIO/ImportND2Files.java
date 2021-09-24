@@ -57,8 +57,8 @@ import function.plugin.mechanism.ParameterMarker;
 		type = JEXPlugin.class,
 		name="Import ND2 Files",
 		menuPath="File IO",
-		visible=false,
-		description="Import image sets saved as a single multi-dimensional ND2 file."
+		visible=true,
+		description="Import image sets saved as a single multi-dimensional ND2 file. Might be broken."
 		)
 public class ImportND2Files extends JEXPlugin {
 	
@@ -168,7 +168,9 @@ public class ImportND2Files extends JEXPlugin {
 				else
 				{
 					String filename = JEXWriter.saveImage(p);
-					DimensionMap map = itr.next().copy();
+					DimensionMap map = null;
+					if(itr.hasNext()) map = itr.next().copy();
+					else break;
 					ret.put(map,filename);
 					Logs.log(map.toString() + " = " + filename, this);
 				}
