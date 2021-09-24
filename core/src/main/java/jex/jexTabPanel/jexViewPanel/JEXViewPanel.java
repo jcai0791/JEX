@@ -1,10 +1,12 @@
 package jex.jexTabPanel.jexViewPanel;
 
 import java.awt.Color;
+import java.awt.Dimension;
 import java.util.TreeMap;
 
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 
 import jex.JEXManager;
 import jex.arrayView.ArrayViewController;
@@ -95,9 +97,11 @@ public class JEXViewPanel extends JPanel {
 			// Make the array controller
 			arrayPaneController = new ArrayViewController();
 			arrayPaneController.setArray(tray);
-			
+			JScrollPane scrollPane = new JScrollPane(arrayPaneController.panel());
+			scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+	        scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
 			// Place the components in this panel
-			this.add(arrayPaneController.panel(), "grow");
+			this.add(scrollPane, "grow");
 		}
 		else
 		{

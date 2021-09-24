@@ -28,6 +28,9 @@ public class DisplayStatics {
 	public static Color textColor = new Color(0, 0, 0);
 	public static Color selectedTextColor = Color.BLUE;
 	
+	public static int arrayWidth = 100;
+	public static int arrayHeight = 60;
+	
 	// icons
 	public static String iconPath = "./icons/";
 	

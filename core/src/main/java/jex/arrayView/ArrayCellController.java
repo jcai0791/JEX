@@ -33,9 +33,11 @@ public class ArrayCellController {
 	public Color borderColor = null;
 	public ArrayCellPanel pane;
 	public JEXDataPanelController dataView;
+	public ArrayViewController parent;
 	
-	public ArrayCellController()
+	public ArrayCellController(ArrayViewController parent)
 	{
+		this.parent = parent;
 		// Link to the signal from a database list change
 		SSCenter.defaultCenter().connect(JEXStatics.jexManager, JEXManager.SELECTEDLABEL, this, "labelSelectionChanged", (Class[]) null);
 		SSCenter.defaultCenter().connect(JEXStatics.jexManager, JEXManager.SELECTEDOBJ, this, "objectSelectionChanged", (Class[]) null);

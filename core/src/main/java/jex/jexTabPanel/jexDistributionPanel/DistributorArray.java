@@ -4,6 +4,7 @@ import Database.DBObjects.JEXEntry;
 import Database.Definition.Experiment;
 
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -15,6 +16,7 @@ import java.util.Vector;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 
 import jex.JEXManager;
 import jex.statics.DisplayStatics;
@@ -30,9 +32,11 @@ public class DistributorArray implements ActionListener {
 	public int rows;
 	public int cols;
 	public JPanel pane = new JPanel();
+	public JScrollPane scrollPane;
+	public JPanel wrapper = new JPanel();
 	public Experiment currentTray;
 	public HashMap<Point,Boolean> selectionArray;
-	
+	public static Dimension PREFERRED_SIZE = new Dimension(100,60);
 	JEXDistributionPanelController parentController;
 	JButton importButton;
 	JButton cancelButton;
@@ -235,6 +239,8 @@ public class DistributorArray implements ActionListener {
 		// add the array panels to this panel
 		if(this.parentController.files == null)
 			this.parentController.files = new HashMap<Point,Vector<Pair<DimensionMap,String>>>();
+		PREFERRED_SIZE = new Dimension(Math.max(JEXStatics.main.centerPane.getWidth()/this.rows,DisplayStatics.arrayWidth),Math.max(JEXStatics.main.centerPane.getHeight()/this.cols,DisplayStatics.arrayHeight));
+		
 		for (int i = 0; i < rows; i++)
 		{
 			for (int j = 0; j < cols; j++)
@@ -252,16 +258,23 @@ public class DistributorArray implements ActionListener {
 				
 				// Get the cell panel
 				JPanel cellpane = this.cellControllers[i][j].panel();
-				
+				cellpane.setMinimumSize(PREFERRED_SIZE);
+				cellpane.setPreferredSize(PREFERRED_SIZE);
 				// add to the panel
-				arrayPanel.add(cellpane, "Cell " + i + " " + j + " 0,width " + percentWidth + "%,height " + percentHeight + "%");
+				arrayPanel.add(cellpane, "Cell " + i + " " + j + " 0");
+				//arrayPanel.add(cellpane, "Cell " + i + " " + j + " 0,width " + percentWidth + "%,height " + percentHeight + "%");
 			}
 		}
 		
+		scrollPane = new JScrollPane(arrayPanel);
+		scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+        
 		// Redo the new panel
 		pane.setBackground(DisplayStatics.background);
 		pane.setLayout(new MigLayout("ins 5, center, center", "[fill,grow]", "10[fill,grow]0[30]10"));
-		pane.add(arrayPanel, "span 2, width 100%, grow, wrap");
+
+		pane.add(scrollPane, "span 2, width 100%, growx, growy, wrap");
 		pane.add(importButton, "growx");
 		pane.add(cancelButton, "growx");
 		

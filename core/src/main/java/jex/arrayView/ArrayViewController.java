@@ -79,7 +79,8 @@ public class ArrayViewController {
 				HierarchyLevel cell = col.get(yString);
 				
 				// Make the array cell controller
-				ArrayCellController cellController = new ArrayCellController();
+				ArrayCellController cellController = new ArrayCellController(this);
+				
 				
 				// Set its required variables and rebuild it
 				cellController.setCell(cell);
@@ -172,7 +173,7 @@ public class ArrayViewController {
 		return width;
 	}
 	
-	class ArrayPanel extends JPanel implements ActionListener {
+	public class ArrayPanel extends JPanel implements ActionListener {
 		
 		private static final long serialVersionUID = 1L;
 		
