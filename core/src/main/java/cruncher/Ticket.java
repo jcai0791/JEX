@@ -187,6 +187,8 @@ public class Ticket implements Callable<Integer>, Canceler{
 			// Stop if canceled;
 			if(this.isCanceled() == true)
 			{
+				//Trigger garbage Collection
+				System.gc();
 				return this.finish(TICKETFLAG_CANCELED);
 			}
 
@@ -235,6 +237,7 @@ public class Ticket implements Callable<Integer>, Canceler{
 			{
 				if(this.isCanceled() == true)
 				{
+					System.gc();
 					return this.finish(this.getTicketFlag());
 				}
 				// Collect the data objects
@@ -267,6 +270,7 @@ public class Ticket implements Callable<Integer>, Canceler{
 						if(temp == null)
 						{
 							Logs.log("Error!!! Couldn't create update object for function with despite having updates for inputs. Aborting.", this);
+							System.gc();
 							return this.finish(TICKETFLAG_ERROR);
 						}
 						updateData.addAll(temp);
@@ -286,6 +290,10 @@ public class Ticket implements Callable<Integer>, Canceler{
 				}
 				this.cr.finalizeTicket(this);
 			}
+			
+			//Trigger garbage collection
+			Logs.log("Triggered garbage collection", this);
+			System.gc();
 
 			// Interact with JEX through a single synchronized function within
 			// cruncher

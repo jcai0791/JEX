@@ -25,6 +25,7 @@ public class Batch extends Vector<Ticket> implements Canceler {
 	
 	public synchronized void finishedTicket(Ticket ticket)
 	{
+		System.gc();
 		Logs.log("Printing batch summary for function: " + ticket.cr.getName(), this);
 		ticket.printTicketFlags();
 		if(this.lastElement() == ticket)
