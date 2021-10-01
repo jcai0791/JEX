@@ -12,8 +12,10 @@ import javax.swing.JPanel;
 import javax.swing.JSplitPane;
 
 import Database.DBObjects.JEXData;
+import Database.DBObjects.JEXDataSingle;
 import Database.DBObjects.JEXEntry;
 import Database.DBObjects.JEXWorkflow;
+import Database.Definition.Type;
 import Database.Definition.TypeName;
 import cruncher.JEXFunction;
 import jex.statics.DisplayStatics;
@@ -22,6 +24,7 @@ import jex.statics.JEXStatics;
 import logs.Logs;
 import miscellaneous.FileUtility;
 import net.miginfocom.swing.MigLayout;
+import tables.DimensionMap;
 
 public class JEXFunctionPanel extends JPanel {
 
@@ -289,6 +292,36 @@ public class JEXFunctionPanel extends JPanel {
 		JEXStatics.cruncher.runWorkflow(workflow, entries, autoSave, autoUpdate);
 	}
 
+	public void runTestFunctions(boolean autoSave, boolean autoUpdate) {
+		TreeSet<JEXEntry> entries = getSelectedEntries();		
+		
+		if(entries == null)
+		{
+			// Warning messages part of getSelectedEntries function
+			return;
+		}
+		
+		JEXEntry firstEntry = entries.first();
+		for(Type t : firstEntry.getDataList().keySet()) {
+			for(String s : firstEntry.getDataList().get(t).keySet()) {
+				JEXData jd = firstEntry.getDataList().get(t).get(s);
+				JEXDataSingle jds = jd.getFirstSingle();
+				DimensionMap dm = jd.getDataMap().firstKey();
+				jd.clearData();
+				jd.addData(dm, jds);
+			}
+		}
+		entries.clear();
+		entries.add(firstEntry);
+
+		// / Else ///
+		// Get the workflow
+		JEXWorkflow workflow = getWorkflow();
+
+		// Rarely used capability. Now using to just save the workflow.
+		JEXStatics.cruncher.runWorkflow(workflow, entries, autoSave, autoUpdate);
+	}
+	
 	/**
 	 * Run all the functions in the list one by one for all entries available
 	 */

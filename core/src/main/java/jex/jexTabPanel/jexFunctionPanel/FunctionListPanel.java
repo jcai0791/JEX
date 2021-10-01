@@ -131,6 +131,9 @@ public class FunctionListPanel implements MouseWheelListener {
 	{
 		this.parent.runAllFunctions(autoSave, autoUpdate);
 	}
+	public void runTestFunctions(boolean autoSave, boolean autoUpdate) {
+		this.parent.runTestFunctions(autoSave, autoUpdate);
+	}
 	
 	public void loadFunctionList()
 	{

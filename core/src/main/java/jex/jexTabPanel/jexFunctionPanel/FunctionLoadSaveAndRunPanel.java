@@ -33,7 +33,8 @@ public class FunctionLoadSaveAndRunPanel implements ActionListener, ItemListener
 	private JButton cancelAll = new JButton();
 	private JCheckBox autoSave = new JCheckBox();
 	private JCheckBox autoUpdate = new JCheckBox();
-
+	private JButton testButton = new JButton();
+	
 	public FunctionLoadSaveAndRunPanel(FunctionListPanel parent)
 	{
 		this.parent = parent;
@@ -50,7 +51,7 @@ public class FunctionLoadSaveAndRunPanel implements ActionListener, ItemListener
 		this.panel = new JPanel();
 		this.panel.setBackground(DisplayStatics.lightBackground);
 		this.panel.setBorder(BorderFactory.createLineBorder(Color.GRAY));
-		this.panel.setLayout(new MigLayout("center, flowy, ins 3", "[fill, grow]", "[fill, grow]3[fill, grow]3[fill, grow]3[fill, grow]3[fill, grow]3[]"));
+		this.panel.setLayout(new MigLayout("center, flowy, ins 3", "[fill, grow]", "[fill, grow]3[fill, grow]3[fill, grow]3[fill, grow]3[fill, grow]3[fill, grow]3[]"));
 		this.panel.setMinimumSize(new Dimension(160,100));
 		// this.setPreferredSize(new Dimension(250,200));
 
@@ -94,6 +95,12 @@ public class FunctionLoadSaveAndRunPanel implements ActionListener, ItemListener
 		// runButton.setMaximumSize(new Dimension(60,500));
 		this.cancelAll.addActionListener(this);
 
+		
+		//Create test button
+		this.testButton.setText("TEST WORKFLOW");
+		this.testButton.setToolTipText("Run Workflow for first image in first entry.");
+		this.testButton.addActionListener(this);
+		
 		// Create autoSave checkBox
 		this.autoSave.setText("Auto-Saving (ON)");
 		this.autoSave.setSelected(true);
@@ -112,6 +119,7 @@ public class FunctionLoadSaveAndRunPanel implements ActionListener, ItemListener
 		this.panel.add(this.saveJXWToDB, "growx, height 10:10:");
 		this.panel.add(this.runAll, "growx, height 10:10:");
 		this.panel.add(this.cancelAll, "growx, height 10:10:");
+		this.panel.add(this.testButton, "growx, height 10:10:");
 		this.panel.add(this.autoSave);
 		this.panel.add(this.autoUpdate);
 	}
@@ -162,6 +170,9 @@ public class FunctionLoadSaveAndRunPanel implements ActionListener, ItemListener
 		else if(e.getSource() == this.saveButton)
 		{
 			this.parent.saveFunctionList();
+		}
+		else if(e.getSource() == this.testButton) {
+			this.parent.runTestFunctions(this.isAutoSavingOn(), this.isAutoUpdatingOn());
 		}
 	}
 
