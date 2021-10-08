@@ -302,15 +302,21 @@ public class JEXFunctionPanel extends JPanel {
 		}
 		
 		JEXEntry firstEntry = entries.first();
-		for(Type t : firstEntry.getDataList().keySet()) {
-			for(String s : firstEntry.getDataList().get(t).keySet()) {
-				JEXData jd = firstEntry.getDataList().get(t).get(s);
+		TreeMap<Type,TreeMap<String,JEXData>> tempDataList = firstEntry.getDataList();
+		firstEntry.setDataList(new TreeMap<Type, TreeMap<String, JEXData>>());
+		for(Type t : tempDataList.keySet()) {
+			for(String s : tempDataList.get(t).keySet()) {
+				JEXData jd = tempDataList.get(t).get(s);
 				JEXDataSingle jds = jd.getFirstSingle();
+				Logs.log(t.toString()+" "+s+" "+jds.get(JEXDataSingle.RELATIVEPATH), this);
 				DimensionMap dm = jd.getDataMap().firstKey();
-				jd.clearData();
-				jd.addData(dm, jds);
+				JEXData newjd = jd.getClassyCopy();
+				newjd.clearData();
+				newjd.addData(dm, jds);
+				JEXStatics.jexDBManager.saveDataInEntry(firstEntry, newjd, true);
 			}
 		}
+		
 		entries.clear();
 		entries.add(firstEntry);
 
@@ -319,7 +325,21 @@ public class JEXFunctionPanel extends JPanel {
 		JEXWorkflow workflow = getWorkflow();
 
 		// Rarely used capability. Now using to just save the workflow.
-		JEXStatics.cruncher.runWorkflow(workflow, entries, autoSave, autoUpdate);
+		try {
+			JEXStatics.cruncher.runWorkflow(workflow, entries, autoSave, autoUpdate);
+		} catch(Exception e) {}
+		finally {
+			//Put all the data back
+			for(Type t : tempDataList.keySet()) {
+				for(String s : tempDataList.get(t).keySet()) {
+					JEXData jd = tempDataList.get(t).get(s);
+					JEXStatics.jexDBManager.saveDataInEntry(firstEntry, jd, true);
+				}
+			}
+			JEXStatics.jexDBManager.updateObjectsView();
+			JEXStatics.jexDBManager.updateDatabaseView();
+		}
+		Logs.log("Finished", this);
 	}
 	
 	/**
