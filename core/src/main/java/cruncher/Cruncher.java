@@ -17,6 +17,7 @@ import Database.DBObjects.JEXData;
 import Database.DBObjects.JEXEntry;
 import Database.DBObjects.JEXWorkflow;
 import Database.DataReader.ImageReader;
+import Database.Definition.Type;
 import Database.Definition.TypeName;
 import jex.statics.JEXDialog;
 import jex.statics.JEXStatics;
@@ -294,6 +295,61 @@ public class Cruncher implements Canceler {
 			{
 				// Then create a ticket for this function and set of entries.
 				Ticket ticket = new Ticket(function, entries, autoSave);
+				batch.add(ticket);
+			}
+			this.batchList.add(batch);
+
+			for (Ticket ticket : batch)
+			{
+				this.runTicket(ticket);
+			}
+		}
+	}
+	public void runWorkflow(JEXWorkflow workflow, TreeSet<JEXEntry> entries, boolean autoSave, boolean autoUpdate, boolean useLabels)
+	{
+		if(!useLabels) {
+			runWorkflow(workflow, entries, autoSave, autoUpdate);
+			return;
+		}
+		if(workflow.size() == 0)
+		{
+			Logs.log("No functions to run. Ignoring request.", this);
+			return;
+		}
+		
+		
+		// Check if we should setup atuo-updating or not
+		JEXFunction function0 = workflow.get(0);
+		if(autoUpdate && function0.getFunctionName().equals("Import Virtual Image Updates"))
+		{
+			this.setUpCruncherForUpdating(workflow, entries, autoSave);
+			this.runUpdate();
+		}
+		else
+		{
+			// Just run the workflow
+			Batch batch = new Batch();
+			for (JEXFunction function : workflow)
+			{
+				TreeSet<JEXEntry> newEntries = new TreeSet<JEXEntry>();
+				for(JEXEntry e : entries) {
+					//If no label name, just add it
+					if(function.labelName  == null || function.labelName.length()==0) {
+						newEntries.add(e);
+						continue;
+					}
+					//Check the label name against the function
+					TreeMap<Type, TreeMap<String, JEXData>> dataListMap = e.getDataList();
+					for(Type t : dataListMap.keySet()) {
+						if(t.matches(JEXData.LABEL)) {
+							for(String s : dataListMap.get(t).keySet()) {
+								if(dataListMap.get(t).get(s).getTypeName().getName().equals(function.labelName)) newEntries.add(e);
+							}
+						}
+					}
+				}
+				// Then create a ticket for this function and set of entries.
+				Ticket ticket = new Ticket(function, newEntries, autoSave);
 				batch.add(ticket);
 			}
 			this.batchList.add(batch);

@@ -36,6 +36,7 @@ public class JEXFunction {
 	public static String OUTPUTS = "__Outputs__";
 	public static String PARAMETERS = "__Parameters__";
 	public static String SAVINGSELECTIONS = "__SavingSelections__";
+	public static String LABELNAME = "__LabelName__";
 	
 	public static String FUNCTION_NAME = "Function Name";
 	public static String INFOTYPE = "Info Type";
@@ -45,13 +46,14 @@ public class JEXFunction {
 	TreeMap<String,TypeName> inputs;
 	TreeMap<Integer,TypeName> outputs;
 	TreeMap<Integer,Boolean> savingSelections;
+	String labelName;
 	// TypeName[] outputTNs ;
 	JEXCrunchable cruncher;
 	
 	public JEXFunction(String functionName) throws InstantiationException
 	{
 		this.cruncher = CrunchFactory.getJEXCrunchable(functionName);
-		
+		labelName = "Valid";
 		if(this.cruncher == null)
 		{
 			throw new InstantiationException();
@@ -156,6 +158,9 @@ public class JEXFunction {
 			{
 				this.parameters.setValueOfParameter(map.get(INFOKEY), single.getValue());
 			}
+			else if(map.get(INFOTYPE).equals(LABELNAME)) {
+				this.setLabelName(single.getValue());
+			}
 			else
 			{ // Saving selections
 				this.savingSelections.put(new Integer(map.get(INFOKEY)), Boolean.parseBoolean(single.getValue()));
@@ -227,7 +232,17 @@ public class JEXFunction {
 			single.setDimensionMap(map);
 			ret.add(single);
 		}
-		
+
+		if(!(labelName ==null || labelName.length()==0)) {
+			JEXDataSingle singleLabel = new JEXDataSingle();
+			DimensionMap map = new DimensionMap();
+			map.put(FUNCTION_NAME, this.getFunctionName());
+			map.put(INFOTYPE, LABELNAME);
+			map.put(INFOKEY, "0");
+			singleLabel.setValue(labelName);
+			singleLabel.setDimensionMap(map);
+			ret.add(singleLabel);
+		}
 		return ret;
 	}
 	
@@ -371,6 +386,14 @@ public class JEXFunction {
 		return this.outputs.get(index).duplicate();
 	}
 	
+	public String getLabelName() {
+		return labelName;
+	}
+	
+	public void setLabelName(String name) {
+		this.labelName = name;
+	}
+	
 	// ADMINISTRATIVE VARIABLES
 	
 	public JEXCrunchable getCrunch()
@@ -410,6 +433,7 @@ public class JEXFunction {
 		result.savingSelections = duplicateSavingSelections(savingSelections);
 		result.getCrunch().setOutputs(result.getExpectedOutputs());
 		result.getCrunch().setCanceler(this.cruncher.getCanceler());
+		result.setLabelName(this.getLabelName());
 		return result;
 	}
 	

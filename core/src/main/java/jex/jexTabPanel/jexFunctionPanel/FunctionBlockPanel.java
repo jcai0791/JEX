@@ -33,6 +33,7 @@ import javax.swing.JTextField;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
+import Database.DBObjects.JEXData;
 import Database.Definition.ParameterSet;
 import Database.Definition.TypeName;
 import cruncher.JEXFunction;
@@ -55,6 +56,7 @@ public class FunctionBlockPanel implements ActionListener, MouseListener {
 	JPanel centerPane = new JPanel();
 	JPanel inputList = new JPanel();
 	JPanel outputList = new JPanel();
+	JPanel labelList = new JPanel();
 	JPanel titlePane = new JPanel();
 	FlatRoundedButton upOneButton = new FlatRoundedButton("<-");
 	FlatRoundedButton downOneButton = new FlatRoundedButton("->");
@@ -149,13 +151,15 @@ public class FunctionBlockPanel implements ActionListener, MouseListener {
 		this.outputList.setBackground(this.foregroundColor);
 		this.outputList.setLayout(new MigLayout("flowy, ins 0", "[fill,grow]", "[]2"));
 		// outputList.setAlignmentX(JPanel.LEFT_ALIGNMENT);
-
+		this.labelList.setBackground(this.foregroundColor);
+		this.labelList.setLayout(new MigLayout("flowy, ins 0", "[fill,grow]", "[]2"));
 		
 		this.centerPane.setBackground(this.foregroundColor);
 		this.centerPane.setLayout(new MigLayout("flowy, ins 0, gapy 3", "[left,fill,grow]", "[]"));
 		this.centerPane.add(this.inputList, "growx,width 50:100:");
 		this.centerPane.add(this.outputList, "growx,width 50:100:");
-
+		this.centerPane.add(this.labelList, "growx,width 50:100:");
+		
 		this.scroll = new JScrollPane(this.centerPane);
 		this.scroll.setBorder(BorderFactory.createEmptyBorder());
 		this.scroll.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
@@ -254,6 +258,13 @@ public class FunctionBlockPanel implements ActionListener, MouseListener {
 		}
 		Logs.log("Created " + nbOutput + " output drag panels", 1, this);
 
+		//Create the label drop
+		JLabel labelLabel = new JLabel("Run on label:");
+		this.labelList.add(labelLabel, "growx");
+		FunctionInputDrop labelDrop = new FunctionInputDrop(this, 0, new TypeName(JEXData.LABEL, function.getLabelName()), "Function only runs on entries with this label");
+		labelDrop.box.setBackground(Color.green);
+		this.labelList.add(labelDrop);
+		
 		// Prepare the name label
 		this.functionName.setText(function.getFunctionName());
 		this.functionName.setFont(FontUtility.boldFont);
@@ -287,7 +298,11 @@ public class FunctionBlockPanel implements ActionListener, MouseListener {
 	 */
 	public void setInput(String inputName, TypeName inputTN)
 	{
-		this.function.setInput(inputName, inputTN);
+		if(inputTN.getType().matches(JEXData.LABEL)) {
+			this.function.setLabelName(inputTN.getName());
+			Logs.log("Set Label name to "+inputTN.getName(), this);
+		}
+		else this.function.setInput(inputName, inputTN);
 		this.inputsChanged();
 	}
 
@@ -561,7 +576,6 @@ public class FunctionBlockPanel implements ActionListener, MouseListener {
 			this.rebuild();
 		}
 	}
-
 	// ----------------------------------------------------
 	// --------- INPUT LISTENER ---------------------------
 	// ----------------------------------------------------

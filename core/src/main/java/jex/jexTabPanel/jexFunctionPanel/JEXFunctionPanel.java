@@ -233,7 +233,7 @@ public class JEXFunctionPanel extends JPanel {
 		// Get the function into a workflow object
 		workflow.add(function.duplicate());
 
-		JEXStatics.cruncher.runWorkflow(workflow, entries, autoSave, false);
+		JEXStatics.cruncher.runWorkflow(workflow, entries, autoSave, false, true);
 		Logs.log(function.getFunctionName() + " submitted", 0, this);
 	}
 
