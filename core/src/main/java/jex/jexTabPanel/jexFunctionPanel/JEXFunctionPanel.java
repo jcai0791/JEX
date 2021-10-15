@@ -289,7 +289,7 @@ public class JEXFunctionPanel extends JPanel {
 		JEXWorkflow workflow = getWorkflow();
 
 		// Rarely used capability. Now using to just save the workflow.
-		JEXStatics.cruncher.runWorkflow(workflow, entries, autoSave, autoUpdate);
+		JEXStatics.cruncher.runWorkflow(workflow, entries, autoSave, autoUpdate, true);
 	}
 
 	public void runTestFunctions(boolean autoSave, boolean autoUpdate) {
