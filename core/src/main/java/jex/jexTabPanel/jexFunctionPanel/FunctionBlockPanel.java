@@ -261,7 +261,7 @@ public class FunctionBlockPanel implements ActionListener, MouseListener {
 		//Create the label drop
 		JLabel labelLabel = new JLabel("Run on label:");
 		this.labelList.add(labelLabel, "growx");
-		FunctionInputDrop labelDrop = new FunctionInputDrop(this, 0, new TypeName(JEXData.LABEL, function.getLabelName()), "Function only runs on entries with this label");
+		FunctionInputDrop labelDrop = new FunctionInputDrop(this, 0, new TypeName(JEXData.LABEL, function.getLabelName()), "Function only runs on entries with this label. Value does not matter.");
 		labelDrop.box.setBackground(Color.green);
 		this.labelList.add(labelDrop);
 		

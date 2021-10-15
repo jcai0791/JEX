@@ -71,8 +71,8 @@ public class LabelDistributionPanel implements ActionListener {
 		this.panel.setLayout(new MigLayout("ins 0, center, center", "[center]", "[fill,grow,center]"));
 		this.contents = new JPanel();
 		this.contents.setBackground(DisplayStatics.lightBackground);
-		this.contents.setLayout(new MigLayout("flowy, ins 5, center, center, width 400:400:400", "[fill,grow]", "[]0[]0[30]5[fill,grow]"));
-		this.panel.add(this.contents);
+		this.contents.setLayout(new MigLayout("flowy, ins 5, center, center, width 100:800:2000", "[fill,grow]", "[]0[]0[30]5[fill,grow]"));
+		this.panel.add(this.contents, "growx");
 		// startButton = new JButton("Start");
 		// startButton.addActionListener(this);
 		
@@ -96,7 +96,7 @@ public class LabelDistributionPanel implements ActionListener {
 		this.contents.add(this.colorPallet.panel(), "growx");
 		this.contents.add(this.manager.panel());
 		this.contents.add(buttonPanel, "growx");
-		this.contents.add(this.labeler.panel(), "grow");
+		this.contents.add(this.labeler.panel(), "growx");
 		
 		SSCenter.defaultCenter().connect(this.manager, DatabaseLabelManager.SIG_SelectionChanged_NULL, this, "selectionChanged", (Class[]) null);
 		SSCenter.defaultCenter().connect(this.manager, DatabaseLabelManager.SIG_ContentsChanged_NULL, this, "contentsChanged", (Class[]) null);
