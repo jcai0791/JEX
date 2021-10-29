@@ -3,6 +3,8 @@ package function.imageUtility;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -15,34 +17,31 @@ import logs.Logs;
 public class VirtualFunctionUtility{
 
 	public VirtualFunctionCruncher function;
-
-	/**
-	 * Format for adding virtual function input support:
-	 * 
-			//Virtual Function support
-			ImageProcessor ip = null;
-			if(imageData.hasVirtualFunctionFlavor()) {
-				try {
-					VirtualFunctionUtility vfu = new VirtualFunctionUtility(imageMap.get(map));
-					ip = vfu.call();
-				} catch (InstantiationException | IllegalAccessException | IOException e1) {
-					e1.printStackTrace();
-				}
-			}
-			else ip = (new ImagePlus(imageMap.get(map)).getProcessor());
-	 */
-
+	public static final String INPUT_STRING = "Input";
+	public static final String PARAMETER_STRING = "Parameter";
+	public static final String UTILITY_STRING = "Utility";
+	
 	public VirtualFunctionUtility(String vfcPath) throws InstantiationException, IllegalAccessException, IOException
 	{
 		//Logs.log("Reading from: "+vfcPath, this);
 		BufferedReader reader = new BufferedReader(new FileReader(vfcPath));
 		String functionName = reader.readLine().split(",")[0];
 
-		//Put new functions here
-		if(functionName.equals("WeightedMeanFilter")) function = new WeightedMeanFilterUtility();
-		else if(functionName.equals("ImageFilter")) function = new ImageFilterUtility();
-		else if(functionName.equals("AdjustImageIntensities")) function = new AdjustImageIntensitiesUtility();
+//		//Put new functions here
+//		if(functionName.equals("WeightedMeanFilter")) function = new WeightedMeanFilterUtility();
+//		else if(functionName.equals("ImageFilter")) function = new ImageFilterUtility();
+//		else if(functionName.equals("AdjustImageIntensities")) function = new AdjustImageIntensitiesUtility();
 		
+		// Create new class based on name
+		try {
+			Class<?> className = Class.forName(this.getClass().getPackage().getName()+"."+functionName+UTILITY_STRING);
+			Constructor<?> constructor = className.getConstructor();
+			Object functionObject = constructor.newInstance();
+			this.function = (VirtualFunctionCruncher)functionObject;
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 
 		String line = "";
 		List<List<String>> table = new ArrayList<List<String>>();
@@ -55,10 +54,10 @@ public class VirtualFunctionUtility{
 		TreeMap<String, String> inputs = new TreeMap<String,String>();
 		TreeMap<String, String> parameters = new TreeMap<String,String>();
 		for(List<String> l : table) {
-			if(l.get(0).equals("Input")) {
+			if(l.get(0).equals(INPUT_STRING)) {
 				inputs.put(l.get(1), l.get(2));
 			}
-			else if (l.get(0).equals("Parameter")) {
+			else if (l.get(0).equals(PARAMETER_STRING)) {
 				if(l.size()>2) parameters.put(l.get(1),l.get(2));
 				else parameters.put(l.get(1),null);
 			}
