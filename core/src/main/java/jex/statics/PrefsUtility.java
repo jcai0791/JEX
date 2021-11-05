@@ -32,6 +32,7 @@ public class PrefsUtility {
 	
 	public static final String ATT_WORKFLOWLOCATION = "Workflow Location";
 	public static final String ATT_FILEDEALT = "File Dealing Time";
+	
 	// public static final String ATT_FILEDEALROW = "File Dealing Row";
 	// public static final String ATT_FILEDEALCOL = "File Dealing Column";
 	
@@ -166,10 +167,10 @@ public class PrefsUtility {
 	{
 		return getUserPrefs().getChildNode(USERNODE_R);
 	}
-	
 	public static String getRBinary()
 	{
-		return getRPrefs().get(ATT_RBINARY, "/Library/Frameworks/R.framework/Resources/bin/R64");
+		//return getRPrefs().get(ATT_RBINARY, "/Library/Frameworks/R.framework/Resources/bin/R64");
+		return getRPrefs().get(ATT_RBINARY, "\"C:\\Program Files\\R\\R-3.6.1\\bin\\Rscript.exe\"");
 	}
 	
 	// public static String getRServeBinary()

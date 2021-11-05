@@ -73,7 +73,7 @@ public class R {
 			{
 				// If we are here we should give up because we tries to start a
 				// new RServe process and failed
-				e.printStackTrace();
+				e2.printStackTrace();
 				return null;
 			}
 		}

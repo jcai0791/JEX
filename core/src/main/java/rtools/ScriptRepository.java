@@ -24,6 +24,7 @@ import org.apache.commons.io.output.ByteArrayOutputStream;
 
 import Database.SingleUserDatabase.JEXWriter;
 import jex.statics.JEXDialog;
+import jex.statics.PrefsUtility;
 import logs.Logs;
 import miscellaneous.DirectoryManager;
 
@@ -200,7 +201,7 @@ public class ScriptRepository {
 		File scriptfile = getScriptFile("rtools/StartRserve.R");
 		if(scriptfile != null && scriptfile.exists())
 		{
-			runSysCommandApache(new String[] { "R CMD Rscript " + R.dQuote(scriptfile.getAbsolutePath()) }, null, false);
+			runSysCommandApache(new String[] { PrefsUtility.getRBinary() +" "+ R.dQuote(scriptfile.getAbsolutePath()) }, null, false);
 		}
 		else
 		{
