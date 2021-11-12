@@ -13,7 +13,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.HashMap;
 import java.util.Set;
-
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
@@ -21,22 +20,23 @@ import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JTextField;
 
 import jex.statics.DisplayStatics;
 import jex.statics.JEXStatics;
 import logs.Logs;
 
 public class GraphicalFunctionWrap extends JDialog implements ActionListener {
-	
+
 	private static final long serialVersionUID = 1L;
-	
+
 	// Working variables
 	HashMap<String,Parameter> parameters;
 	HashMap<Integer,String[]> parametersForSteps;
 	HashMap<Integer,String> labelForStep;
 	public GraphicalCrunchingEnabling function;
 	boolean isValid = false;
-	
+
 	// button looping panel
 	boolean displayLoopPanel = false;
 	boolean autoReduce = true;
@@ -44,7 +44,7 @@ public class GraphicalFunctionWrap extends JDialog implements ActionListener {
 	JButton prevButton = new JButton("Previous");
 	JButton nextButton = new JButton("Next");
 	JButton thisButton = new JButton("Recalculate");
-	
+	JTextField textfield = new JTextField();
 	// GUI variables
 	HashMap<Integer,JLabel> jlabelForStep;
 	HashMap<Integer,JButton> buttonForStep;
@@ -54,29 +54,29 @@ public class GraphicalFunctionWrap extends JDialog implements ActionListener {
 	public JPanel controlPane;
 	JPanel centerPane;
 	Color background = DisplayStatics.background;
-	
+
 	// Center panel
 	// ImagePanel containedPane ;
 	JComponent containedPane;
-	
+
 	public GraphicalFunctionWrap(GraphicalCrunchingEnabling function, HashMap<String,Parameter> parameters)
 	{
 		super(JEXStatics.main, true);
-		
+
 		this.function = function;
 		this.parameters = parameters;
 		parametersForSteps = new HashMap<Integer,String[]>();
 		labelForStep = new HashMap<Integer,String>();
-		
+
 		jlabelForStep = new HashMap<Integer,JLabel>();
 		buttonForStep = new HashMap<Integer,JButton>();
 		paramPanelForStep = new HashMap<Integer,JParameterPanel[]>();
 	}
-	
+
 	public GraphicalFunctionWrap(GraphicalCrunchingEnabling function, ParameterSet params)
 	{
 		super(JEXStatics.main, true);
-		
+
 		this.parameters = new HashMap<String,Parameter>();
 		for (Parameter p : params.getParameters())
 		{
@@ -85,12 +85,12 @@ public class GraphicalFunctionWrap extends JDialog implements ActionListener {
 		this.function = function;
 		parametersForSteps = new HashMap<Integer,String[]>();
 		labelForStep = new HashMap<Integer,String>();
-		
+
 		jlabelForStep = new HashMap<Integer,JLabel>();
 		buttonForStep = new HashMap<Integer,JButton>();
 		paramPanelForStep = new HashMap<Integer,JParameterPanel[]>();
 	}
-	
+
 	/**
 	 * Add a step to the function give the step a naming description and a list of parameters it requires
 	 * 
@@ -103,7 +103,7 @@ public class GraphicalFunctionWrap extends JDialog implements ActionListener {
 		labelForStep.put(new Integer(index), name);
 		parametersForSteps.put(new Integer(index), parameters);
 	}
-	
+
 	/**
 	 * Set up the necessary objects
 	 */
@@ -114,13 +114,13 @@ public class GraphicalFunctionWrap extends JDialog implements ActionListener {
 		validateButton.setMaximumSize(new Dimension(100, 20));
 		validateButton.setPreferredSize(new Dimension(100, 20));
 		validateButton.addActionListener(this);
-		
+
 		controlPane = new JPanel();
 		controlPane.setBackground(background);
 		controlPane.setLayout(new BoxLayout(controlPane, BoxLayout.PAGE_AXIS));
-		controlPane.setMaximumSize(new Dimension(200, 800));
+		//controlPane.setMaximumSize(new Dimension(200, 800));
 		controlPane.setPreferredSize(new Dimension(200, 400));
-		
+
 		Set<Integer> keys = labelForStep.keySet();
 		for (Integer key : keys)
 		{
@@ -129,12 +129,12 @@ public class GraphicalFunctionWrap extends JDialog implements ActionListener {
 			stepButton.setPreferredSize(new Dimension(100, 20));
 			stepButton.addActionListener(this);
 			buttonForStep.put(key, stepButton);
-			
+
 			JLabel label = new JLabel(labelForStep.get(key));
 			label.setMaximumSize(new Dimension(100, 20));
 			label.setPreferredSize(new Dimension(100, 20));
 			jlabelForStep.put(key, label);
-			
+
 			String[] paramNames = parametersForSteps.get(key);
 			JParameterPanel[] panels = new JParameterPanel[paramNames.length];
 			for (int i = 0, len = paramNames.length; i < len; i++)
@@ -146,7 +146,7 @@ public class GraphicalFunctionWrap extends JDialog implements ActionListener {
 			}
 			paramPanelForStep.put(key, panels);
 		}
-		
+
 		buttonPane.setBackground(DisplayStatics.lightBackground);
 		buttonPane.setLayout(new FlowLayout());
 		buttonPane.setMaximumSize(new Dimension(1000, 30));
@@ -157,19 +157,23 @@ public class GraphicalFunctionWrap extends JDialog implements ActionListener {
 		nextButton.setMaximumSize(new Dimension(80, 20));
 		nextButton.setPreferredSize(new Dimension(80, 20));
 		nextButton.addActionListener(this);
+		textfield.setMaximumSize(new Dimension(100,20));
+		textfield.setPreferredSize(new Dimension(100,20));
+		textfield.addActionListener(this);
+		textfield.setToolTipText("Press ENTER to jump to index");
 		thisButton.setMaximumSize(new Dimension(80, 20));
 		thisButton.setPreferredSize(new Dimension(80, 20));
 		thisButton.addActionListener(this);
 		buttonPane.add(prevButton);
 		buttonPane.add(thisButton);
 		buttonPane.add(nextButton);
-		
+		buttonPane.add(textfield);
 		centerPane = new JPanel();
 		centerPane.setBackground(background);
 		centerPane.setLayout(new BorderLayout());
 		centerPane.add(containedPane, BorderLayout.CENTER);
 	}
-	
+
 	// /**
 	// * Place panel in central panel of function maker
 	// * @param pane
@@ -177,7 +181,7 @@ public class GraphicalFunctionWrap extends JDialog implements ActionListener {
 	// public void setInCentralPanel(ImagePanel pane){
 	// containedPane = pane;
 	// }
-	
+
 	/**
 	 * Place panel in central panel of function maker
 	 * 
@@ -187,7 +191,7 @@ public class GraphicalFunctionWrap extends JDialog implements ActionListener {
 	{
 		containedPane = pane;
 	}
-	
+
 	/**
 	 * Set the display of the button panel
 	 * 
@@ -197,7 +201,7 @@ public class GraphicalFunctionWrap extends JDialog implements ActionListener {
 	{
 		this.displayLoopPanel = b;
 	}
-	
+
 	public void setAutoReduce(boolean b)
 	{
 		this.autoReduce = b;
@@ -206,7 +210,7 @@ public class GraphicalFunctionWrap extends JDialog implements ActionListener {
 	{
 		this.isValid = b;
 	}
-	
+
 	/**
 	 * Refresh and rebuild the function maker
 	 */
@@ -217,7 +221,7 @@ public class GraphicalFunctionWrap extends JDialog implements ActionListener {
 		this.invalidate();
 		this.validate();
 	}
-	
+
 	/**
 	 * Display options until step index
 	 * 
@@ -228,7 +232,7 @@ public class GraphicalFunctionWrap extends JDialog implements ActionListener {
 		controlPane.removeAll();
 		// int displayUntil = (currentStep >= labelForStep.size()) ?
 		// labelForStep.size()-1 : currentStep;
-		
+
 		int step = function.getStep();
 		Logs.log("Displaying until step " + step, 1, this);
 		for (int i = 0; i <= step; i++)
@@ -236,29 +240,29 @@ public class GraphicalFunctionWrap extends JDialog implements ActionListener {
 			JLabel label = jlabelForStep.get(new Integer(i));
 			JButton button = buttonForStep.get(new Integer(i));
 			JParameterPanel[] panels = paramPanelForStep.get(new Integer(i));
-			
+
 			StepPanel paramPanel = new StepPanel(label.getText(), panels, button);
 			if(i < step && autoReduce)
 				paramPanel.reduce();
 			controlPane.add(paramPanel);
-			
+
 			controlPane.add(Box.createVerticalStrut(5));
 		}
-		
+
 		controlPane.add(Box.createVerticalStrut(5));
 		int nbsteps = labelForStep.size();
 		if(step >= nbsteps - 1)
 		{
 			controlPane.add(validateButton);
 		}
-		
+
 		controlPane.add(Box.createVerticalGlue());
-		
+
 		controlPane.invalidate();
 		controlPane.validate();
 		controlPane.repaint();
 	}
-	
+
 	/**
 	 * Start the display
 	 * 
@@ -269,24 +273,24 @@ public class GraphicalFunctionWrap extends JDialog implements ActionListener {
 		this.setTitle("Automated JEX algorithm GUI");
 		this.setBounds(100, 100, 950, 650);
 		this.setBackground(background);
-		
+
 		initialize();
 		function.startIT();
-		
+
 		JPanel contentPane = (JPanel) this.getContentPane();
 		contentPane.setLayout(new BorderLayout());
 		contentPane.add(centerPane, BorderLayout.CENTER);
 		contentPane.add(controlPane, BorderLayout.LINE_END);
 		if(this.displayLoopPanel)
 			contentPane.add(buttonPane, BorderLayout.PAGE_END);
-		
+
 		Logs.log("Starting the modal interface", 1, this);
 		this.setModal(true);
 		this.setVisible(true);
-		
+
 		return isValid;
 	}
-	
+
 	public void validateParameters()
 	{
 		Set<Integer> indeces = paramPanelForStep.keySet();
@@ -303,7 +307,7 @@ public class GraphicalFunctionWrap extends JDialog implements ActionListener {
 			}
 		}
 	}
-	
+
 	/**
 	 * Set the parameter named paramName to the value paramValue
 	 * 
@@ -322,7 +326,7 @@ public class GraphicalFunctionWrap extends JDialog implements ActionListener {
 			{
 				if(panel == null)
 					continue;
-				
+
 				Parameter p = panel.getParameter();
 				if(p.getTitle().equals(paramName))
 				{
@@ -331,8 +335,8 @@ public class GraphicalFunctionWrap extends JDialog implements ActionListener {
 			}
 		}
 	}
-	
-	
+
+
 	public void actionPerformed(ActionEvent e)
 	{
 		if(e.getSource() == validateButton)
@@ -356,6 +360,14 @@ public class GraphicalFunctionWrap extends JDialog implements ActionListener {
 		{
 			function.recalculate();
 		}
+		else if(e.getSource()== textfield) {
+			try { 
+				int i = Integer.parseInt(textfield.getText());
+				Logs.log("Running on index "+i,this);
+				function.runStep(i);
+			}catch(Exception e1) {Logs.log("Not valid input", this);}
+
+		}
 		else
 		{
 			Set<Integer> keys = buttonForStep.keySet();
@@ -371,35 +383,36 @@ public class GraphicalFunctionWrap extends JDialog implements ActionListener {
 				}
 			}
 		}
-		
+		textfield.setText(""+function.getStep());
+
 	}
-	
+
 	class StepPanel extends JRoundedCollapsablePanel implements ActionListener {
-		
+
 		private static final long serialVersionUID = 1L;
-		
+
 		JParameterPanel[] parameters;
 		JButton doneButton;
 		String label;
-		
+
 		StepPanel(String label, JParameterPanel[] parameters, JButton button)
 		{
 			super();
 			this.parameters = parameters;
 			this.label = label;
 			this.setPanelTitle(label);
-			
+
 			doneButton = button;
 			doneButton.setMaximumSize(new Dimension(100, 20));
 			doneButton.setPreferredSize(new Dimension(100, 20));
-			
+
 			rebuild();
 		}
-		
+
 		private void rebuild()
 		{
 			this.clear();
-			
+
 			if(parameters != null)
 			{
 				for (JParameterPanel panel : parameters)
@@ -412,15 +425,15 @@ public class GraphicalFunctionWrap extends JDialog implements ActionListener {
 			}
 			// this.add(Box.createVerticalStrut(10));
 			this.addComponent(doneButton);
-			
+
 			this.updateUI();
 		}
-		
+
 		@Override
 		public void actionPerformed(ActionEvent e)
 		{
 			super.actionPerformed(e);
 		}
 	}
-	
+
 }
