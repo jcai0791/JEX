@@ -45,6 +45,7 @@ public class GraphicalFunctionWrap extends JDialog implements ActionListener {
 	JButton nextButton = new JButton("Next");
 	JButton thisButton = new JButton("Recalculate");
 	JTextField textfield = new JTextField();
+	JLabel intensityLabel = new JLabel("Intensity: ");
 	// GUI variables
 	HashMap<Integer,JLabel> jlabelForStep;
 	HashMap<Integer,JButton> buttonForStep;
@@ -279,6 +280,7 @@ public class GraphicalFunctionWrap extends JDialog implements ActionListener {
 
 		JPanel contentPane = (JPanel) this.getContentPane();
 		contentPane.setLayout(new BorderLayout());
+		contentPane.add(intensityLabel, BorderLayout.PAGE_START);
 		contentPane.add(centerPane, BorderLayout.CENTER);
 		contentPane.add(controlPane, BorderLayout.LINE_END);
 		if(this.displayLoopPanel)
@@ -334,6 +336,10 @@ public class GraphicalFunctionWrap extends JDialog implements ActionListener {
 				}
 			}
 		}
+	}
+	
+	public void setIntensityLabel(float f) {
+		intensityLabel.setText("Intensity: "+f);
 	}
 
 

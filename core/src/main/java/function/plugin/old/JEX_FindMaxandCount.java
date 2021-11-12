@@ -1,6 +1,9 @@
 package function.plugin.old;
 
 import java.awt.Point;
+import java.awt.Rectangle;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseMotionListener;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -43,11 +46,11 @@ import tables.DimensionMap;
  * 
  */
 public class JEX_FindMaxandCount extends JEXCrunchable {
-	
+
 	// ----------------------------------------------------
 	// --------- INFORMATION ABOUT THE FUNCTION -----------
 	// ----------------------------------------------------
-	
+
 	/**
 	 * Returns the name of the function
 	 * 
@@ -59,7 +62,7 @@ public class JEX_FindMaxandCount extends JEXCrunchable {
 		String result = "FIND AND COUNT MAXIMA";
 		return result;
 	}
-	
+
 	/**
 	 * This method returns a string explaining what this method does This is purely informational and will display in JEX
 	 * 
@@ -71,7 +74,7 @@ public class JEX_FindMaxandCount extends JEXCrunchable {
 		String result = "Determine the location of fluorescent/bright cells through their pixel value.";
 		return result;
 	}
-	
+
 	/**
 	 * This method defines in which group of function this function will be shown in... Toolboxes (choose one, caps matter): Visualization, Image processing, Custom Cell Analysis, Cell tracking, Image tools Stack processing, Data Importing, Custom
 	 * image analysis, Matlab/Octave
@@ -83,7 +86,7 @@ public class JEX_FindMaxandCount extends JEXCrunchable {
 		String toolbox = "Image processing";
 		return toolbox;
 	}
-	
+
 	/**
 	 * This method defines if the function appears in the list in JEX It should be set to true expect if you have good reason for it
 	 * 
@@ -94,7 +97,7 @@ public class JEX_FindMaxandCount extends JEXCrunchable {
 	{
 		return true;
 	}
-	
+
 	/**
 	 * Returns true if the user wants to allow multithreding
 	 * 
@@ -105,11 +108,11 @@ public class JEX_FindMaxandCount extends JEXCrunchable {
 	{
 		return false;
 	}
-	
+
 	// ----------------------------------------------------
 	// --------- INPUT OUTPUT DEFINITIONS -----------------
 	// ----------------------------------------------------
-	
+
 	/**
 	 * Return the array of input names
 	 * 
@@ -123,7 +126,7 @@ public class JEX_FindMaxandCount extends JEXCrunchable {
 		inputNames[1] = new TypeName(ROI, "Optional ROI");
 		return inputNames;
 	}
-	
+
 	/**
 	 * Return the number of outputs returned by this function
 	 * 
@@ -135,12 +138,12 @@ public class JEX_FindMaxandCount extends JEXCrunchable {
 		defaultOutputNames = new TypeName[2];
 		defaultOutputNames[0] = new TypeName(ROI, "Maxima");
 		defaultOutputNames[1] = new TypeName(VALUE, "Point Count");
-		
+
 		if(outputNames == null)
 			return defaultOutputNames;
 		return outputNames;
 	}
-	
+
 	/**
 	 * Returns a list of parameters necessary for this function to run... Every parameter is defined as a line in a form that provides the ability to set how it will be displayed to the user and what options are available to choose from The simplest
 	 * FormLine can be written as: FormLine p = new FormLine(parameterName); This will provide a text field for the user to input the value of the parameter named parameterName More complex displaying options can be set by consulting the FormLine API
@@ -160,7 +163,7 @@ public class JEX_FindMaxandCount extends JEXCrunchable {
 		Parameter p8 = new Parameter("Auto Threshold On?", "Automatically calculate threshold for image.", Parameter.CHECKBOX, false);
 		Parameter p9 = new Parameter("Auto Threshold Method", "Choose which threshold method you want", Parameter.DROPDOWN, new String[] {"Huang", "Intermodes", "IsoData", "Li", "MaxEntropy", "Mean", "MinError(I)", "Minimum", "Moments", "Otsu", "Percentile", "RenyiEntropy", "Shanbhag", "Triangle", "Yen" });
 
-		
+
 		// Make an array of the parameters and return it
 		ParameterSet parameterArray = new ParameterSet();
 		parameterArray.addParameter(p1);
@@ -174,11 +177,11 @@ public class JEX_FindMaxandCount extends JEXCrunchable {
 		parameterArray.addParameter(p9);
 		return parameterArray;
 	}
-	
+
 	// ----------------------------------------------------
 	// --------- ERROR CHECKING METHODS -------------------
 	// ----------------------------------------------------
-	
+
 	/**
 	 * Returns the status of the input validity checking It is HIGHLY recommended to implement input checking however this can be over-rided by returning false If over-ridden ANY batch function using this function will not be able perform error
 	 * checking...
@@ -190,11 +193,11 @@ public class JEX_FindMaxandCount extends JEXCrunchable {
 	{
 		return true;
 	}
-	
+
 	// ----------------------------------------------------
 	// --------- THE ACTUAL MEAT OF THIS FUNCTION ---------
 	// ----------------------------------------------------
-	
+
 	/**
 	 * Perform the algorithm here
 	 * 
@@ -206,26 +209,26 @@ public class JEX_FindMaxandCount extends JEXCrunchable {
 		JEXData data1 = inputs.get("Source Image");
 		if(!data1.getTypeName().getType().matches(JEXData.IMAGE))
 			return false;
-		
+
 		JEXData data2 = inputs.get("Optional ROI");
-		
+
 		// Run the function
 		FindMaxHelperFunction2 graphFunc = new FindMaxHelperFunction2(entry, data1, data2, outputNames, parameters);
 		if(!Boolean.parseBoolean(this.parameters.getValueOfParameter("Automatic"))) graphFunc.doit();
-		
+
 		// Set the outputs
 		JEXData output1 = graphFunc.output;
 		JEXData output2 = graphFunc.counts;
 		realOutputs.add(output1);
 		realOutputs.add(output2);
-		
+
 		// Return status
 		return true;
 	}
 }
 
 class FindMaxHelperFunction2 implements GraphicalCrunchingEnabling, ImagePanelInteractor {
-	
+
 	ImagePanel imagepanel;
 	GraphicalFunctionWrap wrap;
 	FindMaxima finder;
@@ -236,7 +239,8 @@ class FindMaxHelperFunction2 implements GraphicalCrunchingEnabling, ImagePanelIn
 	TreeMap<DimensionMap,String> outputCounts = new TreeMap<DimensionMap,String>();
 	int index = 0;
 	int atStep = 0;
-	
+	Point currentLocation;
+
 	boolean auto = true;
 	boolean ord = true;
 	int roiX = -1;
@@ -244,7 +248,7 @@ class FindMaxHelperFunction2 implements GraphicalCrunchingEnabling, ImagePanelIn
 	int roiW = -1;
 	int roiH = -1;
 	Roi roi = null;
-	
+
 	ParameterSet params;
 	JEXData imset;
 	JEXData jroi;
@@ -253,7 +257,7 @@ class FindMaxHelperFunction2 implements GraphicalCrunchingEnabling, ImagePanelIn
 	TypeName[] outputNames;
 	JEXEntry entry;
 	int count;
-	
+
 	FindMaxHelperFunction2(JEXEntry entry, JEXData imset, JEXData jroi, TypeName[] outputNames, ParameterSet parameters)
 	{
 		// Pass the variables
@@ -262,7 +266,7 @@ class FindMaxHelperFunction2 implements GraphicalCrunchingEnabling, ImagePanelIn
 		this.outputNames = outputNames;
 		this.params = parameters;
 		this.jroi = jroi;
-		
+
 		// make variables
 		images = ImageReader.readObjectToImagePathTable(imset);
 		this.roi = null;
@@ -272,13 +276,13 @@ class FindMaxHelperFunction2 implements GraphicalCrunchingEnabling, ImagePanelIn
 			ROIPlus roip = RoiReader.readObjectToRoi(jroi);
 			this.roi = (roip == null) ? null : roip.getRoi();
 		}
-		
+
 		dimensions = new ArrayList<DimensionMap>(0);
 		for (DimensionMap map : images.keySet())
 		{
 			dimensions.add(map);
 		}
-		
+
 		// //// Get params
 		auto = Boolean.parseBoolean(parameters.getValueOfParameter("Automatic"));
 		int radius = Integer.parseInt(parameters.getValueOfParameter("Cell Radius"));
@@ -286,7 +290,7 @@ class FindMaxHelperFunction2 implements GraphicalCrunchingEnabling, ImagePanelIn
 		int threshold = Integer.parseInt(params.getValueOfParameter("Threshold"));
 		DimensionMap map = dimensions.get(0);
 		ImageProcessor fp = ImageUtility.getImageProcessor(imset,images, map);
-		
+
 		if(Boolean.parseBoolean(params.getValueOfParameter("Auto Threshold On?"))) {
 			ByteProcessor imp = (ByteProcessor) fp.convertToByte(true);
 			int[] histogram = imp.getHistogram();
@@ -300,13 +304,13 @@ class FindMaxHelperFunction2 implements GraphicalCrunchingEnabling, ImagePanelIn
 			threshold = Integer.parseInt(this.params.getValueOfParameter("Threshold"));
 			Logs.log("Set threshold is: "+ threshold, this);
 		}
-		
+
 		int nbCells = Integer.parseInt(parameters.getValueOfParameter("Number of Cells"));
 		String mode = parameters.getValueOfParameter("Mode");
 		String order = parameters.getValueOfParameter("Loop order");
 		this.ord = (order.equals("Reverse")) ? false : true;
 		this.finder = new FindMaxima();
-		
+
 		this.finder.threshold = threshold;
 		this.finder.cellNB = nbCells;
 		this.finder.fixedCellNb = (mode.equals("Threshold")) ? false : true;
@@ -314,8 +318,8 @@ class FindMaxHelperFunction2 implements GraphicalCrunchingEnabling, ImagePanelIn
 		this.finder.mincellRadius = minradius;
 		if(!this.ord)
 			index = this.images.size() - 1;
-		
-		
+
+
 		wrap = new GraphicalFunctionWrap(this, params);
 		// Prepare the graphics
 		imagepanel = new ImagePanel(this, "Find Max");
@@ -332,19 +336,24 @@ class FindMaxHelperFunction2 implements GraphicalCrunchingEnabling, ImagePanelIn
 			wrap.setValid(true);
 			wrap.dispose();
 		}
-		
+
 	}
-	
+
 	private void displayImage(int index)
 	{
 		DimensionMap map = dimensions.get(index);
 		String imPath = images.get(map);
-		ImagePlus im = new ImagePlus(imPath);
+		ImagePlus im = null;
+
+		if(!imset.hasVirtualFunctionFlavor()) im = new ImagePlus(imPath);
+		else {
+			im = new ImagePlus("Virtual Image",(ImageUtility.getImageProcessor(imset,images,map)));
+		}
 		Logs.log("Placing in imagepanel " + imPath, 1, this);
-		
+
 		imagepanel.setImage(im);
 	}
-	
+
 	/**
 	 * Run the function and open the graphical interface
 	 * 
@@ -354,25 +363,27 @@ class FindMaxHelperFunction2 implements GraphicalCrunchingEnabling, ImagePanelIn
 	{
 		wrap.start();
 	}
-	
+
 	public void runStep(int index)
 	{
 		// Get the new parameters
 		int radius = Integer.parseInt(params.getValueOfParameter("Cell Radius"));
 		int minradius = Integer.parseInt(params.getValueOfParameter("Min Cell Radius"));
-		
-		
+		this.index = index;
+		this.atStep = index;
+		Logs.log("Index is: "+this.index, this);
+
 		int threshold = Integer.parseInt(params.getValueOfParameter("Threshold"));
 		DimensionMap map = dimensions.get(index);
 		String imPath = images.get(map);
-		
+
 		ImagePlus im = null;
-		
+
 		if(!imset.hasVirtualFunctionFlavor()) im = new ImagePlus(imPath);
 		else {
 			im = new ImagePlus("Virtual Image",(ImageUtility.getImageProcessor(imset,images,map)));
 		}
-		
+
 		if(Boolean.parseBoolean(params.getValueOfParameter("Auto Threshold On?"))) {
 			ByteProcessor imp = (ByteProcessor) im.getProcessor().convertToByte(true);
 			int[] histogram = imp.getHistogram();
@@ -386,7 +397,7 @@ class FindMaxHelperFunction2 implements GraphicalCrunchingEnabling, ImagePanelIn
 			threshold = Integer.parseInt(this.params.getValueOfParameter("Threshold"));
 			Logs.log("Set threshold is: "+ threshold, this);
 		}
-		
+
 		int nbCells = Integer.parseInt(params.getValueOfParameter("Number of Cells"));
 		String mode = params.getValueOfParameter("Mode");
 		finder.threshold = threshold;
@@ -394,69 +405,68 @@ class FindMaxHelperFunction2 implements GraphicalCrunchingEnabling, ImagePanelIn
 		finder.fixedCellNb = (mode.equals("Threshold")) ? false : true;
 		finder.cellRadius = radius;
 		finder.mincellRadius = minradius;
-		
+
 		// prepare the images for calculation
-		
+
 		java.awt.Rectangle rect = (roi == null) ? null : roi.getBounds();
 		PointList result = finder.findMaximum(im, rect);
-		
+
 		if(pLists == null)
 			pLists = new TreeMap<DimensionMap,PointList>();
 		pLists.put(map.copy(), result);
-		
+
 		imagepanel.setImage(im);
 		imagepanel.setPointList(result);
 	}
-	
+
 	public void runNext()
 	{}
-	
+
 	public void runPrevious()
 	{}
-	
+
 	public int getStep()
 	{
 		return atStep;
 	}
-	
+
 	public void loopNext()
 	{
 		if(!this.ord)
 			index = index - 1;
 		else
 			index = index + 1;
-		
+
 		if(index >= images.size() - 1)
 			index = images.size() - 1;
 		if(index < 0)
 			index = 0;
-		
 		runStep(index);
 	}
-	
+
 	public void loopPrevious()
 	{
 		if(!this.ord)
 			index = index + 1;
 		else
 			index = index - 1;
-		
+
 		if(index >= images.size() - 1)
 			index = images.size() - 1;
 		if(index < 0)
 			index = 0;
-		
+
 		runStep(index);
 	}
-	
+
 	public void recalculate()
 	{}
-	
+
 	public void startIT()
 	{
 		wrap.displayUntilStep();
 	}
-	
+
 	/**
 	 * Apply the roi to all other images
 	 */
@@ -466,50 +476,53 @@ class FindMaxHelperFunction2 implements GraphicalCrunchingEnabling, ImagePanelIn
 		for (int index = 0; index < dimensions.size(); index++)
 		{
 			DimensionMap map = dimensions.get(index);
-			
+
 			PointList pList = pLists.get(map);
 			if(pList == null || pList.size() == 0)
 			{
 				Logs.log("Running missed step " + map, 1, this);
 				runStep(index);
 			}
-			
+
 			// Status bar
 			int percentage = (int) (100 * ((double) index / (double) images.size()));
 			JEXStatics.statusBar.setProgressPercentage(percentage);
 			// index ++;
 		}
-		
+
 		HashMap<DimensionMap,ROIPlus> outputList = new HashMap<DimensionMap,ROIPlus>();
 		for (int index = 0; index < dimensions.size(); index++)
 		{
 			DimensionMap map = dimensions.get(index);
-			
+
 			PointList pList = pLists.get(map);
 			if(pList == null || pList.size() == 0)
 			{
 				outputCounts.put(map, "0");
 				continue;
 			}
-			
+
 			ROIPlus thisROI = new ROIPlus(pList, ROIPlus.ROI_POINT);
 			count = thisROI.getPointList().size();
 			outputList.put(map.copy(), thisROI);
 			outputCounts.put(map, "" + count);
 			Logs.log("Finished processing " + atStep + " of " + images.size() + ".", 1, this);
 		}
-		
+
 		output = RoiWriter.makeRoiObject(outputNames[0].getName(), outputList);
 		counts = ValueWriter.makeValueTable(outputNames[1].getName(), outputCounts);
 	}
-	
+
 	public void clickedPoint(Point p)
-	{}
-	
+	{
+		
+	}
+
 	public void pressedPoint(Point p)
 	{}
-	
+
 	public void mouseMoved(Point p)
-	{}
-	
+	{
+		wrap.setIntensityLabel(imagepanel.source.getProcessor().getPixelValue(p.x,p.y));
+	}
 }

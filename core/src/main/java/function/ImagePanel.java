@@ -36,7 +36,7 @@ public class ImagePanel extends JPanel implements MouseListener, MouseMotionList
 	
 	// Class variables
 	private ImagePanelInteractor controller;
-	private ImagePlus source = null;
+	public ImagePlus source = null;
 	private String title = "";
 	
 	private int orgX = 0; // x
@@ -517,7 +517,10 @@ public class ImagePanel extends JPanel implements MouseListener, MouseMotionList
 	}
 	
 	public void mouseMoved(MouseEvent e)
-	{}
+	{
+		Point scaleP = e.getPoint();
+		controller.mouseMoved(backScale(scaleP));
+	}
 	
 	public void mouseWheelMoved(MouseWheelEvent e)
 	{
