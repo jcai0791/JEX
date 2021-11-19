@@ -232,8 +232,106 @@ public class RScripter implements PlugInController, ActionListener, ClipboardOwn
 	
 	public static String getRScript_FileTable(TreeSet<JEXEntry> entries, TypeName tn)
 	{
-		
-		//		TreeMap<DimensionMap,String> files = new TreeMap<DimensionMap,String>();
+		return getRScript_FileTable(entries, tn, "jData");
+//		//		TreeMap<DimensionMap,String> files = new TreeMap<DimensionMap,String>();
+//		//		DimTable totalDimTable = new DimTable();
+//		//		TreeSet<String> expts = new TreeSet<String>();
+//		//		// TreeSet<String> trays = new TreeSet<String>();
+//		//		TreeSet<String> xs = new TreeSet<String>();
+//		//		TreeSet<String> ys = new TreeSet<String>();
+//		
+//		LSVList lsv = new LSVList();
+//		lsv.add("sourceGitHubFile <- function(user, repo, branch, file){");
+//		lsv.add("require(curl)");
+//		lsv.add("destfile <- tempfile()");
+//		lsv.add("fileToGet <- paste0('https://raw.githubusercontent.com/', user, '/', repo, '/', branch, '/', file)");
+//		lsv.add("curl_download(url=fileToGet, destfile)");
+//		lsv.add("source(destfile)");
+//		lsv.add("}");
+//		lsv.add("");
+//		lsv.add("library(data.table)");
+//		lsv.add("library(bit64)");
+//		lsv.add("sourceGitHubFile('jaywarrick','R-General','master','.Rprofile')");
+//		lsv.add("sourceGitHubFile('jaywarrick','R-Cytoprofiling','master','PreProcessingHelpers.R')");
+//		lsv.add("jData <- list()");
+//		for (JEXEntry e : entries)
+//		{
+//			
+//			JEXData data = JEXStatics.jexManager.getDataOfTypeNameInEntry(tn, e);
+//			if(data != null)
+//			{
+//				String dataS = getJEXDataAsRString(e, tn);
+//				lsv.add("jData[[" + R.sQuote(e.getEntryID()) + "]] <- " + dataS);
+//				//				DimTable tempDimTable = data.getDimTable();
+//				//				totalDimTable = DimTable.union(totalDimTable, tempDimTable);
+//				//				if(tn.getType().matches(JEXData.FILE))
+//				//				{
+//				//					TreeMap<DimensionMap,String> temp = FileReader.readObjectToFilePathTable(data);
+//				//					for (DimensionMap map : temp.keySet())
+//				//					{
+//				//						DimensionMap newMap = map.copy();
+//				//						String expt = e.getEntryExperiment();
+//				//						// String tray = e.getEntryTrayName();
+//				//						int x = e.getTrayX();
+//				//						int y = e.getTrayY();
+//				//						newMap.put("Experiment", expt);
+//				//						// newMap.put("Tray", tray);
+//				//						newMap.put("X", "" + x);
+//				//						newMap.put("Y", "" + y);
+//				//						expts.add(expt);
+//				//						// trays.add(tray);
+//				//						xs.add("" + x);
+//				//						ys.add("" + y);
+//				//						files.put(newMap, temp.get(map));
+//				//					}
+//				//				}
+//				//				else
+//				//				{
+//				//					DimensionMap newMap = new DimensionMap();
+//				//					String expt = e.getEntryExperiment();
+//				//					// String tray = e.getEntryTrayName();
+//				//					int x = e.getTrayX();
+//				//					int y = e.getTrayY();
+//				//					newMap.put("Experiment", expt);
+//				//					// newMap.put("Tray", tray);
+//				//					newMap.put("X", "" + x);
+//				//					newMap.put("Y", "" + y);
+//				//					expts.add(expt);
+//				//					// trays.add(tray);
+//				//					xs.add("" + x);
+//				//					ys.add("" + y);
+//				//					String path = JEXWriter.getDatabaseFolder() + File.separator + data.getDetachedRelativePath();
+//				//					files.put(newMap, path);
+//				//				}
+//			}
+//		}
+//		lsv.add("jData <- rbindlist(jData)");
+//		lsv.add("l(x, time.col, idCols, imageDims, labelDims) %=% readJEXDataTables(jData)");
+//		//		Dim exptDim = new Dim("Experiment");
+//		//		exptDim.dimValues.addAll(expts);
+//		//		// Dim trayDim = new Dim("Tray");
+//		//		// trayDim.dimValues.addAll(trays);
+//		//		Dim xDim = new Dim("X");
+//		//		xDim.dimValues.addAll(xs);
+//		//		Dim yDim = new Dim("Y");
+//		//		yDim.dimValues.addAll(ys);
+//		//		DimTable newTable = new DimTable();
+//		//		newTable.add(exptDim);
+//		//		// newTable.add(trayDim);
+//		//		newTable.add(xDim);
+//		//		newTable.add(yDim);
+//		//		newTable.addAll(totalDimTable);
+//		//		
+//		//		String path = JEXTableWriter.writeTable("tempFileTable", new Table<String>(newTable, files));
+//		//		LSVList commands = new LSVList();
+//		//		commands.add("library(foreign)");
+//		//		commands.add("fileTable <- read.arff(" + R.quotedPath(path) + ")");
+//		
+//		return lsv.toString();
+	}
+	
+	public static String getRScript_FileTable(TreeSet<JEXEntry> entries, TypeName tn, String varName) {
+//		TreeMap<DimensionMap,String> files = new TreeMap<DimensionMap,String>();
 		//		DimTable totalDimTable = new DimTable();
 		//		TreeSet<String> expts = new TreeSet<String>();
 		//		// TreeSet<String> trays = new TreeSet<String>();
@@ -253,7 +351,7 @@ public class RScripter implements PlugInController, ActionListener, ClipboardOwn
 		lsv.add("library(bit64)");
 		lsv.add("sourceGitHubFile('jaywarrick','R-General','master','.Rprofile')");
 		lsv.add("sourceGitHubFile('jaywarrick','R-Cytoprofiling','master','PreProcessingHelpers.R')");
-		lsv.add("jData <- list()");
+		lsv.add(varName+" <- list()");
 		for (JEXEntry e : entries)
 		{
 			
@@ -261,7 +359,7 @@ public class RScripter implements PlugInController, ActionListener, ClipboardOwn
 			if(data != null)
 			{
 				String dataS = getJEXDataAsRString(e, tn);
-				lsv.add("jData[[" + R.sQuote(e.getEntryID()) + "]] <- " + dataS);
+				lsv.add(varName+"[[" + R.sQuote(e.getEntryID()) + "]] <- " + dataS);
 				//				DimTable tempDimTable = data.getDimTable();
 				//				totalDimTable = DimTable.union(totalDimTable, tempDimTable);
 				//				if(tn.getType().matches(JEXData.FILE))
@@ -305,8 +403,8 @@ public class RScripter implements PlugInController, ActionListener, ClipboardOwn
 				//				}
 			}
 		}
-		lsv.add("jData <- rbindlist(jData)");
-		lsv.add("l(x, time.col, idCols, imageDims, labelDims) %=% readJEXDataTables(jData)");
+		lsv.add(varName+" <- rbindlist("+varName+")");
+		lsv.add("l(x, time.col, idCols, imageDims, labelDims) %=% readJEXDataTables("+varName+")");
 		//		Dim exptDim = new Dim("Experiment");
 		//		exptDim.dimValues.addAll(expts);
 		//		// Dim trayDim = new Dim("Tray");

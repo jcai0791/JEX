@@ -18,6 +18,7 @@ import Database.DataWriter.FileWriter;
 import Database.DataWriter.ImageWriter;
 import Database.SingleUserDatabase.JEXWriter;
 import jex.statics.JEXDialog;
+import jex.statics.JEXStatics;
 import jex.statics.OsVersion;
 import logs.Logs;
 import miscellaneous.CSVList;
@@ -26,6 +27,7 @@ import miscellaneous.FileUtility;
 import miscellaneous.LSVList;
 import miscellaneous.SSVList;
 import miscellaneous.StringUtility;
+import plugin.rscripter.RScripter;
 import tables.DimensionMap;
 import tables.Table;
 
@@ -677,6 +679,11 @@ public class R {
 		R.eval(name + "$type <- " + R.sQuote(data.getTypeName().getType().toString()));
 		R.eval(name + "$name <- " + R.sQuote(data.getTypeName().getName()));
 		R.eval(name + "$value <- read.arff(" + R.quotedPath(path) + ")");
+	}
+	
+	public static void initializeData2(JEXData data, String name) {
+		if(data==null) return;
+		R.eval(RScripter.getRScript_FileTable(JEXStatics.jexManager.getSelectedEntries(), data.getTypeName(),name));
 	}
 
 	public static JEXData getCharacterVectorAsJEXDataFileObject(String expression, boolean createImageObject)

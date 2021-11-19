@@ -15,6 +15,7 @@ import function.plugin.mechanism.JEXPlugin;
 import function.plugin.mechanism.MarkerConstants;
 import function.plugin.mechanism.OutputMarker;
 import function.plugin.mechanism.ParameterMarker;
+import jex.statics.JEXStatics;
 import logs.Logs;
 import rtools.R;
 import tables.DimensionMap;
@@ -60,6 +61,25 @@ public class CallRScript extends JEXPlugin {
 	JEXData data5;
 
 	/////////// Define Parameters ///////////
+	public final String header = "library(foreign)\n" + 
+			"library(data.table)\n" + 
+			"library(bit64)\n" + 
+			"sourceGitHubFile <- function(user, repo, branch, file){\n" + 
+			"	require(curl)\n" + 
+			"	destfile <- tempfile()\n" + 
+			"	fileToGet <- paste0('https://raw.githubusercontent.com/', user, '/', repo, '/', branch, '/', file)\n" + 
+			"	curl_download(url=fileToGet, destfile)\n" + 
+			"	source(destfile)\n" + 
+			"}\n" + 
+			"sourceGitHubFile('jaywarrick','R-General','master','.Rprofile')\n" + 
+			"sourceGitHubFile('jaywarrick','R-Cytoprofiling','master','PreProcessingHelpers.R')"+
+			"my.roll.median <- function(x, win.width=2, na.rm=T, ...)\n" + 
+			"{\n" + 
+			"	# Also check out the \"fill\" argument to rollapply (?rollapply)\n" + 
+			"	library(zoo)\n" + 
+			"	# This will return a vector of the same size as original and will deal with NAs and optimize for mean.\n" + 
+			"	return(rollapply(x, width=win.width, FUN=median, na.rm=na.rm, ..., partial=F, align='center'))\n" + 
+			"}";
 
 	public final String scriptDefaultValue = "### Some pointers... ###\n\n" + 
 
@@ -143,6 +163,9 @@ public class CallRScript extends JEXPlugin {
 	
 	@ParameterMarker(uiOrder=3, name="Eval line-by-line?", description="Evaluate script line by line (not good for loops or function defs, i.e., multiline statements, but can help debug).", ui=MarkerConstants.UI_CHECKBOX, defaultBoolean=false)
 	boolean lineByLine;
+	
+	@ParameterMarker(uiOrder = 4, name = "Input Variables", description="Define extra variables that are available to the script (e.g. fileName=\"C:\\temp\")", ui=MarkerConstants.UI_TEXTFIELD, defaultText = "")
+	String variables;
 
 	/////////// Define Outputs ///////////
 
@@ -167,12 +190,17 @@ public class CallRScript extends JEXPlugin {
 	@Override
 	public boolean run(JEXEntry optionalEntry)
 	{
+		JEXEntry firstEntry = JEXStatics.jexManager.getSelectedEntries().first();
+		if(optionalEntry.getTrayX()!=firstEntry.getTrayX()||optionalEntry.getTrayY()!=firstEntry.getTrayY()) return true;
 		R.initializeWorkspace();
-		R.initializeData(data1, "data1");
-		R.initializeData(data2, "data2");
-		R.initializeData(data3, "data3");
-		R.initializeData(data4, "data4");
-		R.initializeData(data5, "data5");
+		R.eval(header);
+		parseVariables();
+		R.initializeData2(data1, "data1");
+		R.initializeData2(data2, "data2");
+		R.initializeData2(data3, "data3");
+		R.initializeData2(data4, "data4");
+		R.initializeData2(data5, "data5");
+		//R.eval(RScripter.getRScript_FileTable(JEXStatics.jexManager.getSelectedEntries(), data1.getTypeName()));
 
 		if(console)
 		{
@@ -270,5 +298,10 @@ public class CallRScript extends JEXPlugin {
 			e.printStackTrace();
 		}
 		return null;
+	}
+	
+	public void parseVariables() {
+		String[] assignments = variables.split(",");
+		for(String s : assignments) R.eval(s);
 	}
 }
