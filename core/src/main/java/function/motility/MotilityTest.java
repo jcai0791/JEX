@@ -8,36 +8,80 @@ import java.util.TreeMap;
 import fiji.threshold.Auto_Local_Threshold;
 import ij.ImagePlus;
 import ij.ImageStack;
+import ij.io.FileSaver;
 import ij.plugin.AVI_Reader;
 import ij.process.ImageProcessor;
 import movieio.jmf.JMF_MovieReaderSimple;
+import net.haesleinhuepf.clij.clearcl.ClearCLBuffer;
+import net.haesleinhuepf.clij.coremem.enums.NativeTypeEnum;
+import net.haesleinhuepf.clij2.CLIJ2;
+import net.haesleinhuepf.clij2.CLIJ2Ops;
+import net.haesleinhuepf.clij2.plugins.Median2DBox;
+import net.haesleinhuepf.clij2.plugins.Median2DSphere;
+import net.haesleinhuepf.clij2.plugins.SumOfAllPixels;
+import net.haesleinhuepf.clijx.CLIJx;
+import net.haesleinhuepf.clijx.plugins.LocalThresholdBernsen;
+import net.haesleinhuepf.clijx.plugins.LocalThresholdPhansalkar;
 import tables.DimensionMap;
 
 public class MotilityTest {
 	public static ImageStack stack;
-	public static int threshold;
+	public static CLIJ2 clij;
+	public static CLIJx clijx;
 	public static int split = 10;
+	
 	public static void main(String[] args) {
-		String neutro = "C:\\Users\\MMB\\Desktop\\Joseph Cai\\Neutrophil Motility Analysis\\Neutro\\Neutro.avi";
-		System.out.println("Neutro");
-		test(neutro);
+		testAll();
 		
-		String med3d = "C:\\Users\\MMB\\Desktop\\Joseph Cai\\Neutrophil Motility Analysis\\Neutro+HUVEC\\Neutro+HUVEC-3D.avi";
-		System.out.println("Neutro+HUVEC-3D");
+	}
+	public static void testAll() {
+		clij = CLIJ2.getInstance();
+		clijx = CLIJx.getInstance();
+//		String neutro = "C:\\Users\\MMB\\Desktop\\Joseph Cai\\Neutrophil Motility Analysis\\Neutro\\Neutro.avi";
+//		System.out.println("Neutro");
+//		test(neutro);
+//		String med3d = "C:\\Users\\MMB\\Desktop\\Joseph Cai\\Neutrophil Motility Analysis\\Neutro+HUVEC\\Neutro+HUVEC-3D.avi";
+//		System.out.println("Neutro+HUVEC-3D");
+//		test(med3d);
+//		String med2d = "C:\\Users\\MMB\\Desktop\\Joseph Cai\\Neutrophil Motility Analysis\\Neutro+HUVEC\\Neutro+HUVEC-2D.avi";
+//		System.out.println("Neutro+HUVEC-2D");
+//		test(med2d);
+//		String fast3d = "C:\\Users\\MMB\\Desktop\\Joseph Cai\\Neutrophil Motility Analysis\\Neutro+PBMC+HUVEC\\Neutro+PBMC+HUVEC-3D.avi";
+//		System.out.println("Neutro+PBMC+HUVEC-3D");
+//		test(fast3d);
+//		String fast2d = "C:\\Users\\MMB\\Desktop\\Joseph Cai\\Neutrophil Motility Analysis\\Neutro+PBMC+HUVEC\\Neutro+PBMC+HUVEC-2D.avi";
+//		System.out.println("Neutro+PBMC+HUVEC-2D");
+//		test(fast2d);
+		String med3d = "C:\\Users\\MMB\\Desktop\\Joseph Cai\\Neutrophil Motility Analysis\\Neutro+HUVEC\\Neutro+HUVEC-3D001.avi";
+		System.out.println("Neutro+HUVEC-3D001");
 		test(med3d);
-		
-		String med2d = "C:\\Users\\MMB\\Desktop\\Joseph Cai\\Neutrophil Motility Analysis\\Neutro+HUVEC\\Neutro+HUVEC-2D.avi";
-		System.out.println("Neutro+HUVEC-2D");
+		String med2d = "C:\\Users\\MMB\\Desktop\\Joseph Cai\\Neutrophil Motility Analysis\\Neutro+HUVEC\\Neutro+HUVEC-2D001.avi";
+		System.out.println("Neutro+HUVEC-2D001");
 		test(med2d);
-		
 		String fast3d = "C:\\Users\\MMB\\Desktop\\Joseph Cai\\Neutrophil Motility Analysis\\Neutro+PBMC+HUVEC\\Neutro+PBMC+HUVEC-3D001.avi";
-		System.out.println("Neutro+PBMC+HUVEC-3D");
-		spread(fast3d);
-		
-		String fast2d = "C:\\Users\\MMB\\Desktop\\Joseph Cai\\Neutrophil Motility Analysis\\Neutro+PBMC+HUVEC\\Neutro+PBMC+HUVEC-2D.avi";
-		System.out.println("Neutro+PBMC+HUVEC-2D");
+		System.out.println("Neutro+PBMC+HUVEC-3D001");
+		test(fast3d);
+		String fast2d = "C:\\Users\\MMB\\Desktop\\Joseph Cai\\Neutrophil Motility Analysis\\Neutro+PBMC+HUVEC\\Neutro+PBMC+HUVEC-2D001.avi";
+		System.out.println("Neutro+PBMC+HUVEC-2D001");
 		test(fast2d);
+	}
+	public static void saveAll() {
+		clij = CLIJ2.getInstance();
+		clijx = CLIJx.getInstance();
+		String neutro = "C:\\Users\\MMB\\Desktop\\Joseph Cai\\Neutrophil Motility Analysis\\Neutro\\Neutro.avi";
+		save(neutro, "Neutro");
 		
+		String med3d001 = "C:\\Users\\MMB\\Desktop\\Joseph Cai\\Neutrophil Motility Analysis\\Neutro+HUVEC\\Neutro+HUVEC-3D001.avi";
+		save(med3d001, "Neutro+HUVEC-3D");
+		
+		String med2d001 = "C:\\Users\\MMB\\Desktop\\Joseph Cai\\Neutrophil Motility Analysis\\Neutro+HUVEC\\Neutro+HUVEC-2D001.avi";
+		save(med2d001, "Neutro+HUVEC-2D");
+		
+		String fast3d001 = "C:\\Users\\MMB\\Desktop\\Joseph Cai\\Neutrophil Motility Analysis\\Neutro+PBMC+HUVEC\\Neutro+PBMC+HUVEC-3D001.avi";
+		save(fast3d001, "Neutro+PBMC+HUVEC-3D");
+		
+		String fast2d001 = "C:\\Users\\MMB\\Desktop\\Joseph Cai\\Neutrophil Motility Analysis\\Neutro+PBMC+HUVEC\\Neutro+PBMC+HUVEC-2D001.avi";
+		save(fast2d001, "Neutro+PBMC+HUVEC-2D");
 	}
 	public static void spread(String fileName) {
 		stack = getImageStack(fileName);
@@ -54,37 +98,43 @@ public class MotilityTest {
 		}
 		for(long[] ll : total) System.out.println(Arrays.toString(ll));
 	}
+	
+	public static void save(String source, String fileName) {
+		stack = getImageStack(source);
+		ImagePlus image1 = (getThresholdedImage(new ImagePlus(fileName+" Thresholded", stack.getProcessor(1).convertToByteProcessor())));
+		ImagePlus image2 = (getThresholdedImage(new ImagePlus(fileName+" Thresholded", stack.getProcessor(100).convertToByteProcessor())));
+		FileSaver fs = new FileSaver(absoluteDifference(image1,image2));
+		fs.saveAsTiff("C:\\Users\\MMB\\Desktop\\Joseph Cai\\Neutrophil Motility Analysis\\Images\\"+fileName+" Difference1-100.tif");
+	}
 	/**
 	 * Performs tests on movie
 	 * @param fileName movie to be processed
 	 */
 	public static void test(String fileName) {
 		stack = getImageStack(fileName);
-		//System.out.println(stack.getSize());
-		threshold = stack.getProcessor(1).convertToByteProcessor().getAutoThreshold();
-		
-//		ImageProcessor previp =  stack.getProcessor(1).convertToByteProcessor();
-//		previp.autoThreshold();
-//		int[][] prev = previp.getIntArray();
-//		
-//		for(int i = 2; i<stack.size(); i++) {
-//			ImageProcessor ip =  stack.getProcessor(i).convertToByteProcessor();
-//			ip.autoThreshold();
-//			int[][] arr = ip.getIntArray();
-//			System.out.println(sum(abs(difference(arr,prev))));
-//			prev= arr;
-//		}
+		long white = 2048*2044-sum(getThresholdedImage(new ImagePlus("",stack.getProcessor(1).convertToByteProcessor())).getProcessor().getIntArray())/255;
+		System.out.println("White: "+white);
 		int base = 1;
-		long[] total = new long[20];
-		for(int i = 2; i<=20*(stack.size()/20); i++) {
-			total[i%20]+=diff(i,base);
-			if(i%20==1) {
-				
-				base = i;
-			}
-			//System.out.println((diff(i,base))/1000);
+		int length = 10;
+		
+		
+//		long[] total = new long[length];
+//		for(int i = 2; i<=length*(stack.size()/length); i++) {
+//			
+//			if(i%length==1) {
+//				
+//				base = i;
+//			}
+//			else total[i%length]+=combined(i,base);
+//			//System.out.println((diff(i,base))/1000);
+//		}
+//		for(long l : total) System.out.println(l*1000/white);
+//		
+		for(int i = 4; i<=stack.size(); i++) {
+			double difference = combined(i-3,i);
+			System.out.println((int)(difference*1000/white));
 		}
-		System.out.println(Arrays.toString(total));
+		
 	}
 	/**
 	 * Finds the difference between two frames in video
@@ -176,6 +226,67 @@ public class MotilityTest {
 			}
 		}
 		return ret;
+	}
+	public static ImagePlus absoluteDifference(ImagePlus src1, ImagePlus src2) {
+		
+		ClearCLBuffer s1 = clij.push(src1);
+		ClearCLBuffer s2 = clij.push(src2);
+		ClearCLBuffer difference = clij.create(s1);
+		clij.absoluteDifference(s1,s2, difference);
+		ImagePlus ret = clij.pull(difference);
+		s1.close();
+		s2.close();
+		difference.close();
+		return ret;
+	}
+	
+	public static ImagePlus getThresholdedImage(ImagePlus src) {
+		CLIJx clijx = CLIJx.getInstance();
+		ClearCLBuffer s1 = clij.push(src);
+		ClearCLBuffer s1thresholded = clij.create(s1);
+		ClearCLBuffer s1despeckle = clij.create(s1);
+		//LocalThresholdBernsen.localThresholdBernsen(clijx, s1, s1thresholded, 15, 0);
+		LocalThresholdPhansalkar.localThresholdPhansalkar(clijx, s1, s1thresholded, 15, (float)0.15, (float)0.5);
+		Median2DBox.median2DBox(clij, s1thresholded, s1despeckle, 1, 1);
+		//ImagePlus ret = clij.pull(s1despeckle);
+		ClearCLBuffer s1output = clij.create(s1);
+		clij.multiplyImageAndScalar(s1despeckle,s1output,255);
+		ImagePlus ret= clij.pull(s1output);
+		s1.close();
+		s1thresholded.close();
+		s1despeckle.close();
+		s1output.close();
+		return ret;
+	}
+	
+	public static double combined(ImagePlus src1, ImagePlus src2) {
+		ClearCLBuffer s1 = clij.push(src1);
+		ClearCLBuffer s2 = clij.push(src2);
+		ClearCLBuffer s1thresholded = clij.create(s1);
+		ClearCLBuffer s2thresholded = clij.create(s2);
+		ClearCLBuffer s1despeckle = clij.create(s1);
+		ClearCLBuffer s2despeckle = clij.create(s2);
+//		LocalThresholdBernsen.localThresholdBernsen(clijx, s1, s1thresholded, 15, 0);
+//		LocalThresholdBernsen.localThresholdBernsen(clijx, s2, s2thresholded, 15, 0);
+		LocalThresholdPhansalkar.localThresholdPhansalkar(clijx, s1, s1thresholded, 15, (float)0.15, (float)0.5);
+		LocalThresholdPhansalkar.localThresholdPhansalkar(clijx, s2, s2thresholded, 15, (float)0.15, (float)0.5);
+		Median2DSphere.median2DSphere(clij, s1thresholded, s1despeckle, 5, 5);
+		Median2DSphere.median2DSphere(clij, s2thresholded, s2despeckle, 5, 5);
+		ClearCLBuffer difference = clij.create(s1);
+		clij.absoluteDifference(s1despeckle,s2despeckle, difference);
+		double ret = SumOfAllPixels.sumOfAllPixels(clij, difference);
+		s1.close();
+		s2.close();
+		s1thresholded.close();
+		s2thresholded.close();
+		s1despeckle.close();
+		s2despeckle.close();
+		difference.close();
+		return ret;
+	}
+	
+	public static double combined(int first, int second) {
+		return combined(new ImagePlus("",stack.getProcessor(first).convertToByteProcessor()),new ImagePlus("",stack.getProcessor(second).convertToByteProcessor()));
 	}
 	/**
 	 * Takes absolute value of all elements of 2D array
