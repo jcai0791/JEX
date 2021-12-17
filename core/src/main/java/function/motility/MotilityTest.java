@@ -23,7 +23,14 @@ import net.haesleinhuepf.clijx.CLIJx;
 import net.haesleinhuepf.clijx.plugins.LocalThresholdBernsen;
 import net.haesleinhuepf.clijx.plugins.LocalThresholdPhansalkar;
 import tables.DimensionMap;
-
+/**
+ * https://www.researchgate.net/publication/329115119_Segmentation_of_Total_Cell_Area_in_Brightfield_Microscopy_Images
+ * https://clij.github.io/clij2-docs/reference_simpleITKCannyEdgeDetection
+ * https://clij.github.io/clij2-docs/reference_simpleITKZeroCrossingBasedEdgeDetection
+ * Enhance contrast
+ * @author MMB
+ *
+ */
 public class MotilityTest {
 	public static ImageStack stack;
 	public static CLIJ2 clij;
@@ -31,57 +38,57 @@ public class MotilityTest {
 	public static int split = 10;
 	
 	public static void main(String[] args) {
-		testAll();
-		
+		//testAll();
+		saveAll();
 	}
 	public static void testAll() {
 		clij = CLIJ2.getInstance();
 		clijx = CLIJx.getInstance();
-//		String neutro = "C:\\Users\\MMB\\Desktop\\Joseph Cai\\Neutrophil Motility Analysis\\Neutro\\Neutro.avi";
-//		System.out.println("Neutro");
-//		test(neutro);
-//		String med3d = "C:\\Users\\MMB\\Desktop\\Joseph Cai\\Neutrophil Motility Analysis\\Neutro+HUVEC\\Neutro+HUVEC-3D.avi";
-//		System.out.println("Neutro+HUVEC-3D");
-//		test(med3d);
-//		String med2d = "C:\\Users\\MMB\\Desktop\\Joseph Cai\\Neutrophil Motility Analysis\\Neutro+HUVEC\\Neutro+HUVEC-2D.avi";
-//		System.out.println("Neutro+HUVEC-2D");
-//		test(med2d);
-//		String fast3d = "C:\\Users\\MMB\\Desktop\\Joseph Cai\\Neutrophil Motility Analysis\\Neutro+PBMC+HUVEC\\Neutro+PBMC+HUVEC-3D.avi";
-//		System.out.println("Neutro+PBMC+HUVEC-3D");
-//		test(fast3d);
-//		String fast2d = "C:\\Users\\MMB\\Desktop\\Joseph Cai\\Neutrophil Motility Analysis\\Neutro+PBMC+HUVEC\\Neutro+PBMC+HUVEC-2D.avi";
-//		System.out.println("Neutro+PBMC+HUVEC-2D");
-//		test(fast2d);
-		String med3d = "C:\\Users\\MMB\\Desktop\\Joseph Cai\\Neutrophil Motility Analysis\\Neutro+HUVEC\\Neutro+HUVEC-3D001.avi";
-		System.out.println("Neutro+HUVEC-3D001");
+		String neutro = "C:\\Users\\MMB\\Desktop\\Joseph Cai\\Neutrophil Motility Analysis\\Neutro\\Neutro.avi";
+		System.out.println("Neutro");
+		test(neutro);
+		String med3d = "C:\\Users\\MMB\\Desktop\\Joseph Cai\\Neutrophil Motility Analysis\\Neutro+HUVEC\\Neutro+HUVEC-3D.avi";
+		System.out.println("Neutro+HUVEC-3D");
 		test(med3d);
-		String med2d = "C:\\Users\\MMB\\Desktop\\Joseph Cai\\Neutrophil Motility Analysis\\Neutro+HUVEC\\Neutro+HUVEC-2D001.avi";
-		System.out.println("Neutro+HUVEC-2D001");
+		String med2d = "C:\\Users\\MMB\\Desktop\\Joseph Cai\\Neutrophil Motility Analysis\\Neutro+HUVEC\\Neutro+HUVEC-2D.avi";
+		System.out.println("Neutro+HUVEC-2D");
 		test(med2d);
-		String fast3d = "C:\\Users\\MMB\\Desktop\\Joseph Cai\\Neutrophil Motility Analysis\\Neutro+PBMC+HUVEC\\Neutro+PBMC+HUVEC-3D001.avi";
-		System.out.println("Neutro+PBMC+HUVEC-3D001");
+		String fast3d = "C:\\Users\\MMB\\Desktop\\Joseph Cai\\Neutrophil Motility Analysis\\Neutro+PBMC+HUVEC\\Neutro+PBMC+HUVEC-3D.avi";
+		System.out.println("Neutro+PBMC+HUVEC-3D");
 		test(fast3d);
-		String fast2d = "C:\\Users\\MMB\\Desktop\\Joseph Cai\\Neutrophil Motility Analysis\\Neutro+PBMC+HUVEC\\Neutro+PBMC+HUVEC-2D001.avi";
-		System.out.println("Neutro+PBMC+HUVEC-2D001");
+		String fast2d = "C:\\Users\\MMB\\Desktop\\Joseph Cai\\Neutrophil Motility Analysis\\Neutro+PBMC+HUVEC\\Neutro+PBMC+HUVEC-2D.avi";
+		System.out.println("Neutro+PBMC+HUVEC-2D");
 		test(fast2d);
+//		String med3d = "C:\\Users\\MMB\\Desktop\\Joseph Cai\\Neutrophil Motility Analysis\\Neutro+HUVEC\\Neutro+HUVEC-3D001.avi";
+//		System.out.println("Neutro+HUVEC-3D001");
+//		test(med3d);
+//		String med2d = "C:\\Users\\MMB\\Desktop\\Joseph Cai\\Neutrophil Motility Analysis\\Neutro+HUVEC\\Neutro+HUVEC-2D001.avi";
+//		System.out.println("Neutro+HUVEC-2D001");
+//		test(med2d);
+//		String fast3d = "C:\\Users\\MMB\\Desktop\\Joseph Cai\\Neutrophil Motility Analysis\\Neutro+PBMC+HUVEC\\Neutro+PBMC+HUVEC-3D001.avi";
+//		System.out.println("Neutro+PBMC+HUVEC-3D001");
+//		test(fast3d);
+//		String fast2d = "C:\\Users\\MMB\\Desktop\\Joseph Cai\\Neutrophil Motility Analysis\\Neutro+PBMC+HUVEC\\Neutro+PBMC+HUVEC-2D001.avi";
+//		System.out.println("Neutro+PBMC+HUVEC-2D001");
+//		test(fast2d);
 	}
 	public static void saveAll() {
 		clij = CLIJ2.getInstance();
 		clijx = CLIJx.getInstance();
-		String neutro = "C:\\Users\\MMB\\Desktop\\Joseph Cai\\Neutrophil Motility Analysis\\Neutro\\Neutro.avi";
-		save(neutro, "Neutro");
-		
-		String med3d001 = "C:\\Users\\MMB\\Desktop\\Joseph Cai\\Neutrophil Motility Analysis\\Neutro+HUVEC\\Neutro+HUVEC-3D001.avi";
-		save(med3d001, "Neutro+HUVEC-3D");
+//		String neutro = "C:\\Users\\MMB\\Desktop\\Joseph Cai\\Neutrophil Motility Analysis\\Neutro\\Neutro.avi";
+//		save(neutro, "Neutro");
+//		
+//		String med3d001 = "C:\\Users\\MMB\\Desktop\\Joseph Cai\\Neutrophil Motility Analysis\\Neutro+HUVEC\\Neutro+HUVEC-3D001.avi";
+//		save(med3d001, "Neutro+HUVEC-3D");
 		
 		String med2d001 = "C:\\Users\\MMB\\Desktop\\Joseph Cai\\Neutrophil Motility Analysis\\Neutro+HUVEC\\Neutro+HUVEC-2D001.avi";
 		save(med2d001, "Neutro+HUVEC-2D");
 		
-		String fast3d001 = "C:\\Users\\MMB\\Desktop\\Joseph Cai\\Neutrophil Motility Analysis\\Neutro+PBMC+HUVEC\\Neutro+PBMC+HUVEC-3D001.avi";
-		save(fast3d001, "Neutro+PBMC+HUVEC-3D");
-		
-		String fast2d001 = "C:\\Users\\MMB\\Desktop\\Joseph Cai\\Neutrophil Motility Analysis\\Neutro+PBMC+HUVEC\\Neutro+PBMC+HUVEC-2D001.avi";
-		save(fast2d001, "Neutro+PBMC+HUVEC-2D");
+//		String fast3d001 = "C:\\Users\\MMB\\Desktop\\Joseph Cai\\Neutrophil Motility Analysis\\Neutro+PBMC+HUVEC\\Neutro+PBMC+HUVEC-3D001.avi";
+//		save(fast3d001, "Neutro+PBMC+HUVEC-3D");
+//		
+//		String fast2d001 = "C:\\Users\\MMB\\Desktop\\Joseph Cai\\Neutrophil Motility Analysis\\Neutro+PBMC+HUVEC\\Neutro+PBMC+HUVEC-2D001.avi";
+//		save(fast2d001, "Neutro+PBMC+HUVEC-2D");
 	}
 	public static void spread(String fileName) {
 		stack = getImageStack(fileName);
